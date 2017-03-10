@@ -5,11 +5,28 @@ import React, {
 
 class InfiniteCarouselDots extends Component {
 
+  getDotsStyle = () => {};
+
+  getDotStyle = () => {};
+
   render() {
     let dots = [];
     for (let i=0; i < this.props.numberOfDots; i++) {
-      dots.push(<li key={i + 1} />);
+      dots.push(
+        <li 
+          key={i + 1}
+          data-index={i}
+        >
+          <a 
+            href='#'
+            onClick={this.props.onClick}
+          >
+            {i + 1}
+          </a>
+        </li>
+      );
     }
+
     return (
       <ul className='dots'>
         {dots}

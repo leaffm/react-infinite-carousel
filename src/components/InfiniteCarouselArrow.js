@@ -8,7 +8,7 @@ class InfiniteCarouselArrow extends Component {
   render() {
     return (
       <div          
-          className=''
+          className='arrow'
           onClick={this.props.onClick}
       >
         <a
@@ -25,7 +25,7 @@ class InfiniteCarouselArrow extends Component {
 
 InfiniteCarouselArrow.propTypes = {
   next: PropTypes.bool,
-  onClick: PropTypes.func
+  onClick: PropTypes.func.isRequired
 };
 
 InfiniteCarouselArrow.defaultProps = {

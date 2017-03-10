@@ -1,16 +1,18 @@
 .CarouselFrame {
-	width: 300px;
+	width: 100%;
 	overflow: hidden;
 }
 
 .CarouselTrack {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
 }
 
 .CarouselSlide {
-	postion: relative;
-
+	position: relative;
+	float: left;
 	display: inline-block;
+	margin: 0 10px;
+}
+
+.CarouselSlide img {
+	width: 100%;
 }
