@@ -49,11 +49,15 @@ class InfiniteCarousel extends Component {
     // initial state
     this.state = {
       currentIndex: 0,
+      
       childrenCount: 0,
+      
       slidesCount: 0,
       slidesWidth: 1,
       slidePages: 1,
+      
       frameWidth: 1,
+      
       children: {}
     };
   }
@@ -75,21 +79,22 @@ class InfiniteCarousel extends Component {
   getTrackStyles = () => {
     const trackWidth = (this.state.slidesWidth + (this.props.slidesSpacing * 2)) * (this.state.slidesCount + this.props.slidesToShow * 2);
     const totalSlideWidth = this.state.slidesWidth + (this.props.slidesSpacing * 2);
-    const initialTrackPostion = totalSlideWidth * this.props.slidesToShow
-    const trackPosition = initialTrackPostion + (totalSlideWidth * this.state.currentIndex)
+    const initialTrackPostion = totalSlideWidth * this.props.slidesToShow;
+    const trackPosition = initialTrackPostion + (totalSlideWidth * this.state.currentIndex);
+    const transition = this.state.animating ? `transform 500ms ease` : '';
+
+    console.log(`animating: ${transition}`);
 
     return {
       position: 'relative',
-      
       display: 'block',
       width: trackWidth,
       height: 'auto',
       padding: 0,
-
+      transition: transition,
       //-ms-transform: `translate(${-trackInitialPosition}, 0)`;
       //-webkit-transform: `translate(${-trackInitialPosition}, 0)`;
       transform: `translate(${-trackPosition}px, 0px)`,
-
       boxSizing: 'border-box',
       MozBoxSizing: 'border-box'
     };
@@ -143,13 +148,13 @@ class InfiniteCarousel extends Component {
   };
 
   getTargetIndex = (index) => {
-    const childrenReminder = this.state.childrenCount % this.props.slidesToScroll;
     let targetIndex = index;
+    const childrenReminder = this.state.childrenCount % this.props.slidesToShow;
     if (index < 0) {
-      if (childrenReminder !== 0) {
-        targetIndex = this.state.childrenCount - childrenReminder;
+      if (this.state.currentIndex === 0) {
+        targetIndex = this.state.childrenCount - this.props.slidesToShow;
       } else {
-        targetIndex = this.state.childrenCount + index;
+        targetIndex = 0;
       }
     } else if(index >= this.state.childrenCount) {
       if (childrenReminder !== 0) {
@@ -159,49 +164,67 @@ class InfiniteCarousel extends Component {
       }
     } else if(childrenReminder !== 0 && index === (this.state.childrenCount - childrenReminder)) {
       targetIndex = index - (this.props.slidesToScroll - childrenReminder);
+    } else {
+      targetIndex = index;
     }
 
     return targetIndex;
   };
 
-  handleTrack = (targetIndex, newIndex) => {
-    if (targetIndex < 0 || targetIndex >= this.props.children.length) {
+  handleTrack = (targetIndex, currentIndex) => {
+    const callback = () => {
+      setTimeout(() => {
+        this.setState({
+          currentIndex: currentIndex,
+          animating: false
+        });
+      }, 500);
+    };
+    if (targetIndex < 0) {
       // animar hacia el target index y en el callback setear el new index sin animación
-      
+      this.setState({
+        currentIndex: targetIndex,
+        animating: true
+      }, callback);
+    } else if (targetIndex >= this.props.children.length) {
+      // animar hacia el target index y en el callback setear el new index sin animación
+      console.log('slide');
+      this.setState({
+        currentIndex: targetIndex,
+        animating: true
+      }, callback);
     } else {
       // animar hacia el new index y setear el state
+      this.setState({
+        currentIndex: currentIndex,
+        animating: true
+      });
     }
   };
 
   moveToNext = (event) => {
     event.preventDefault();
-    const nextIndex = this.state.currentIndex + this.props.slidesToShow;
-    const currentIndex = this.getTargetIndex(nextIndex);
-    this.setState({
-      currentIndex
-    });
+    const targetIndex = this.state.currentIndex + this.props.slidesToShow;
+    const currentIndex = this.getTargetIndex(targetIndex);
+    this.handleTrack(targetIndex, currentIndex);
   };
 
   moveToPrevious = (event) => {
     event.preventDefault();
-    const prevIndex = this.state.currentIndex - this.props.slidesToShow;
-    const currentIndex = this.getTargetIndex(prevIndex);
-    this.handleTrack(prevIndex, currentIndex);
-    this.setState({
-      currentIndex
-    });
+    let targetIndex = this.state.currentIndex - this.props.slidesToShow;
+    const currentIndex = this.getTargetIndex(targetIndex);
+    if (targetIndex < 0 && this.state.currentIndex !== 0) {
+      targetIndex = 0;
+    }
+    this.handleTrack(targetIndex, currentIndex);
   };
 
   onDotClick = (event) => {
     event.preventDefault();
     var targetIndex = event.target.parentElement.getAttribute('data-index');
     const currentIndex = this.getTargetIndex(targetIndex * this.props.slidesToScroll);
-    this.setState({
-      currentIndex
-    });
+    this.handleTrack(targetIndex * this.props.slidesToScroll, currentIndex);
   };
-
-
 
   render() {
     let prevArrow, nextArrow, dots;
