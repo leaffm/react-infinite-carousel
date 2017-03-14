@@ -37,7 +37,7 @@ class InfiniteCarousel extends Component {
     arrows: true,
     dots: true,
     slidesToShow: 3,
-    slidesToScroll: 3,
+    slidesToScroll: 1,
     slidesSpacing: 10,
     autoCycle: false,
     cycleInterval: 500
@@ -70,7 +70,20 @@ class InfiniteCarousel extends Component {
 
   componentDidMount() {
     this.setDimensions();
+
+    if (!window) {
+      return
+    }
+    if (window.addEventListener) {
+      window.addEventListener('resize', this.onWindowResized);
+    } else {
+      window.attachEvent('onresize', this.onWindowResized);
+    }
   }
+
+  onWindowResized = () => {
+    this.setDimensions();
+  };
 
   setChildren = () => {
     const children = this.getChildrenList(this.props.children, this.props.slidesToShow);
@@ -118,8 +131,7 @@ class InfiniteCarousel extends Component {
     const frameWidth = getElementWidth(this.refs.frame);
     const slidesWidth = (frameWidth / this.props.slidesToShow) - (this.props.slidesSpacing * 2);
     const slidePages = this.props.children.length > this.props.slidesToShow ? Math.ceil(this.props.children.length / this.props.slidesToShow) : 1;
-    
-    const lazyLoadedList = this.getLazyLoadedIndexes(this.state.children, this.state.currentIndex);
+    const lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, this.state.currentIndex);
 
     this.setState({
       childrenCount,
@@ -135,16 +147,16 @@ class InfiniteCarousel extends Component {
     let lazyLoadedList = this.state.lazyLoadedList;
     let start, limit;
 
-    if (currentIndex === 0 && !this.state.lazyLoadedList.indexOf(currentIndex) >= 0) {
-      start = children.length - this.props.slidesToShow;
-      limit = children.length - 1;
+    start = children.length + this.props.slidesToShow;
+    if (currentIndex === 0 && this.state.lazyLoadedList.indexOf(0) < 0) {
+      limit = start + this.props.slidesToShow - 1;
       for (var index = start; index <= limit; index++) {
         lazyLoadedList.push(index);
       }
     }
 
-    if (currentIndex === children.length - this.props.slidesToShow && !this.state.lazyLoadedList.indexOf(currentIndex) >= 0) {
-      start = 0;
+    start = 0;
+    if (currentIndex === children.length - this.props.slidesToShow && this.state.lazyLoadedList.indexOf(children.length + this.props.slidesToShow - 1) < 0) {
       limit = start + this.props.slidesToShow - 1;
       for (var index = start; index <= limit; index++) {
         lazyLoadedList.push(index);
@@ -155,7 +167,7 @@ class InfiniteCarousel extends Component {
     limit = start + (this.props.slidesToShow - 1);
 
     for (var index = start; index <= limit; index++) {
-      if (!this.state.lazyLoadedList.indexOf(index) >= 0) {
+      if (this.state.lazyLoadedList.indexOf(index) < 0) {
         lazyLoadedList.push(index);
       }
     }
@@ -201,10 +213,10 @@ class InfiniteCarousel extends Component {
 
   getTargetIndex = (index) => {
     let targetIndex = index;
-    const childrenReminder = this.state.childrenCount % this.props.slidesToShow;
+    const childrenReminder = this.state.childrenCount % this.props.slidesToScroll;
     if (index < 0) {
       if (this.state.currentIndex === 0) {
-        targetIndex = this.state.childrenCount - this.props.slidesToShow;
+        targetIndex = this.state.childrenCount - this.props.slidesToScroll;
       } else {
         targetIndex = 0;
       }
@@ -234,7 +246,7 @@ class InfiniteCarousel extends Component {
     };
 
     const activePage = Math.ceil(currentIndex / this.props.slidesToShow);
-    const lazyLoadedList = this.getLazyLoadedIndexes(this.state.children, currentIndex);
+    const lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, currentIndex);
 
     if (targetIndex < 0) {
       // animar hacia el target index y en el callback setear el new index sin animación
@@ -265,14 +277,14 @@ class InfiniteCarousel extends Component {
 
   moveToNext = (event) => {
     event.preventDefault();
-    const targetIndex = this.state.currentIndex + this.props.slidesToShow;
+    const targetIndex = this.state.currentIndex + this.props.slidesToScroll;
     const currentIndex = this.getTargetIndex(targetIndex);
     this.handleTrack(targetIndex, currentIndex);
   };
 
   moveToPrevious = (event) => {
     event.preventDefault();
-    let targetIndex = this.state.currentIndex - this.props.slidesToShow;
+    let targetIndex = this.state.currentIndex - this.props.slidesToScroll;
     const currentIndex = this.getTargetIndex(targetIndex);
     if (targetIndex < 0 && this.state.currentIndex !== 0) {
       targetIndex = 0;
@@ -283,8 +295,8 @@ class InfiniteCarousel extends Component {
   onDotClick = (event) => {
     event.preventDefault();
     var targetIndex = event.target.parentElement.getAttribute('data-index');
-    const currentIndex = this.getTargetIndex(targetIndex * this.props.slidesToScroll);
-    this.handleTrack(targetIndex * this.props.slidesToScroll, currentIndex);
+    const currentIndex = this.getTargetIndex(targetIndex * this.props.slidesToShow);
+    this.handleTrack(targetIndex * this.props.slidesToShow, currentIndex);
   };
 
   render() {
