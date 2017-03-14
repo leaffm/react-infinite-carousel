@@ -16,6 +16,7 @@ class InfiniteCarouselDots extends Component {
         <li 
           key={i + 1}
           data-index={i}
+          className={ i === this.props.activePage ? 'active' : ''}
         >
           <a 
             href='#'
@@ -37,6 +38,7 @@ class InfiniteCarouselDots extends Component {
 
 InfiniteCarouselDots.propTypes = {
   numberOfDots: PropTypes.number,
+  activePage: PropTypes.number,
   onClick: PropTypes.func
 };
 

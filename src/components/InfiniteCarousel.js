@@ -4,8 +4,8 @@ import React, {
   Children
 } from 'react';
 import ReactDOM from 'react-dom';
-import {getElementWidth} from '../common/helpers';
 
+import {getElementWidth, getElementHeight} from '../common/helpers';
 import InfiniteCarouselArrow from './InfiniteCarouselArrow';
 import InfiniteCarouselDots from './InfiniteCarouselDots';
 
@@ -49,6 +49,7 @@ class InfiniteCarousel extends Component {
     // initial state
     this.state = {
       currentIndex: 0,
+      activePage: 0,
       
       childrenCount: 0,
       
@@ -58,7 +59,8 @@ class InfiniteCarousel extends Component {
       
       frameWidth: 1,
       
-      children: {}
+      children: [],
+      lazyLoadedList: []
     };
   }
 
@@ -71,8 +73,10 @@ class InfiniteCarousel extends Component {
   }
 
   setChildren = () => {
+    const children = this.getChildrenList(this.props.children, this.props.slidesToShow);
+    
     this.setState({
-      children: this.getChildren(this.props.children, this.props.slidesToShow)
+      children
     });
   };
 
@@ -83,8 +87,6 @@ class InfiniteCarousel extends Component {
     const trackPosition = initialTrackPostion + (totalSlideWidth * this.state.currentIndex);
     const transition = this.state.animating ? `transform 500ms ease` : '';
 
-    console.log(`animating: ${transition}`);
-
     return {
       position: 'relative',
       display: 'block',
@@ -92,8 +94,6 @@ class InfiniteCarousel extends Component {
       height: 'auto',
       padding: 0,
       transition: transition,
-      //-ms-transform: `translate(${-trackInitialPosition}, 0)`;
-      //-webkit-transform: `translate(${-trackInitialPosition}, 0)`;
       transform: `translate(${-trackPosition}px, 0px)`,
       boxSizing: 'border-box',
       MozBoxSizing: 'border-box'
@@ -108,7 +108,7 @@ class InfiniteCarousel extends Component {
       float: 'left',
       display: 'block',
       width: slidesWidth,
-      height: '100%'
+      height: 'auto'
     };
   };
 
@@ -118,24 +118,76 @@ class InfiniteCarousel extends Component {
     const frameWidth = getElementWidth(this.refs.frame);
     const slidesWidth = (frameWidth / this.props.slidesToShow) - (this.props.slidesSpacing * 2);
     const slidePages = this.props.children.length > this.props.slidesToShow ? Math.ceil(this.props.children.length / this.props.slidesToShow) : 1;
+    
+    const lazyLoadedList = this.getLazyLoadedIndexes(this.state.children, this.state.currentIndex);
 
     this.setState({
       childrenCount,
       slidesCount,
       slidesWidth,
       frameWidth,
-      slidePages
+      slidePages,
+      lazyLoadedList
     });
   };
 
-  formatChildren = (children) => {
-    const self = this;
-    return Children.map(children, function(child, index) {
-      return <li className='CarouselSlide' style={self.getSlideStyles()} key={index}>{child}</li>;
+  getLazyLoadedIndexes = (children, currentIndex) => {
+    let lazyLoadedList = this.state.lazyLoadedList;
+    let start, limit;
+
+    if (currentIndex === 0 && !this.state.lazyLoadedList.indexOf(currentIndex) >= 0) {
+      start = children.length - this.props.slidesToShow;
+      limit = children.length - 1;
+      for (var index = start; index <= limit; index++) {
+        lazyLoadedList.push(index);
+      }
+    }
+
+    if (currentIndex === children.length - this.props.slidesToShow && !this.state.lazyLoadedList.indexOf(currentIndex) >= 0) {
+      start = 0;
+      limit = start + this.props.slidesToShow - 1;
+      for (var index = start; index <= limit; index++) {
+        lazyLoadedList.push(index);
+      }
+    }
+
+    start = currentIndex + this.props.slidesToShow;
+    limit = start + (this.props.slidesToShow - 1);
+
+    for (var index = start; index <= limit; index++) {
+      if (!this.state.lazyLoadedList.indexOf(index) >= 0) {
+        lazyLoadedList.push(index);
+      }
+    }
+
+    return lazyLoadedList;
+  };
+
+  getFormatedChildren = (children, lazyLoadedList) => {
+    return React.Children.map(children, (child, index)  => {
+      if (!this.props.lazyLoad || lazyLoadedList.indexOf(index) >= 0) {
+        return (
+          <li
+            className='CarouselSlide'
+            style={this.getSlideStyles()}
+            key={index}>
+              {child}
+          </li>
+        );
+      } else {
+        return (
+          <li
+            className='CarouselSlide'
+            style={this.getSlideStyles()}
+            key={index}>
+              <img src='data:image/gif;base64,R0lGODlhAQABAIABAEdJRgAAACwAAAAAAQABAAACAkQBAA==' />
+          </li>
+        );
+      }
     });
   };
 
-  getChildren = (children, slidesToShow) => {
+  getChildrenList = (children, slidesToShow) => {
     if(!Array.isArray(children)) {
       children = [children];
     }
@@ -180,24 +232,33 @@ class InfiniteCarousel extends Component {
         });
       }, 500);
     };
+
+    const activePage = Math.ceil(currentIndex / this.props.slidesToShow);
+    const lazyLoadedList = this.getLazyLoadedIndexes(this.state.children, currentIndex);
+
     if (targetIndex < 0) {
       // animar hacia el target index y en el callback setear el new index sin animación
       this.setState({
         currentIndex: targetIndex,
-        animating: true
+        activePage,
+        animating: true,
+        lazyLoadedList
       }, callback);
     } else if (targetIndex >= this.props.children.length) {
       // animar hacia el target index y en el callback setear el new index sin animación
-      console.log('slide');
       this.setState({
         currentIndex: targetIndex,
-        animating: true
+        activePage,
+        animating: true,
+        lazyLoadedList
       }, callback);
     } else {
       // animar hacia el new index y setear el state
       this.setState({
         currentIndex: currentIndex,
-        animating: true
+        activePage,
+        animating: true,
+        lazyLoadedList
       });
     }
   };
@@ -249,11 +310,12 @@ class InfiniteCarousel extends Component {
         <InfiniteCarouselDots
           numberOfDots={this.state.slidePages}
           onClick={this.onDotClick}
+          activePage={this.state.activePage}
         />
       );
     }
 
-    const children = this.formatChildren(this.state.children)
+    const children = this.getFormatedChildren(this.state.children, this.state.lazyLoadedList);
 
     return (
       <div className='Carousel'>
@@ -265,6 +327,7 @@ class InfiniteCarousel extends Component {
           <ul 
             className={'CarouselTrack'}
             style={this.getTrackStyles()}
+            ref='track'
           >
             {children}
           </ul>
