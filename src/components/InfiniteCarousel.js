@@ -211,12 +211,12 @@ class InfiniteCarousel extends Component {
     }
   };
 
-  getTargetIndex = (index) => {
+  getTargetIndex = (index, slidesToScroll) => {
     let targetIndex = index;
-    const childrenReminder = this.state.childrenCount % this.props.slidesToScroll;
+    const childrenReminder = this.state.childrenCount % slidesToScroll;
     if (index < 0) {
       if (this.state.currentIndex === 0) {
-        targetIndex = this.state.childrenCount - this.props.slidesToScroll;
+        targetIndex = this.state.childrenCount - slidesToScroll;
       } else {
         targetIndex = 0;
       }
@@ -227,7 +227,7 @@ class InfiniteCarousel extends Component {
         targetIndex = index - this.state.childrenCount;
       }
     } else if(childrenReminder !== 0 && index === (this.state.childrenCount - childrenReminder)) {
-      targetIndex = index - (this.props.slidesToScroll - childrenReminder);
+      targetIndex = index - (slidesToScroll - childrenReminder);
     } else {
       targetIndex = index;
     }
@@ -278,14 +278,14 @@ class InfiniteCarousel extends Component {
   moveToNext = (event) => {
     event.preventDefault();
     const targetIndex = this.state.currentIndex + this.props.slidesToScroll;
-    const currentIndex = this.getTargetIndex(targetIndex);
+    const currentIndex = this.getTargetIndex(targetIndex, this.props.slidesToScroll);
     this.handleTrack(targetIndex, currentIndex);
   };
 
   moveToPrevious = (event) => {
     event.preventDefault();
     let targetIndex = this.state.currentIndex - this.props.slidesToScroll;
-    const currentIndex = this.getTargetIndex(targetIndex);
+    const currentIndex = this.getTargetIndex(targetIndex, this.props.slidesToScroll);
     if (targetIndex < 0 && this.state.currentIndex !== 0) {
       targetIndex = 0;
     }
@@ -295,7 +295,7 @@ class InfiniteCarousel extends Component {
   onDotClick = (event) => {
     event.preventDefault();
     var targetIndex = event.target.parentElement.getAttribute('data-index');
-    const currentIndex = this.getTargetIndex(targetIndex * this.props.slidesToShow);
+    const currentIndex = this.getTargetIndex(targetIndex * this.props.slidesToShow, this.props.slidesToShow);
     this.handleTrack(targetIndex * this.props.slidesToShow, currentIndex);
   };
 
