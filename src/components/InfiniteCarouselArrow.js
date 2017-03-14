@@ -12,8 +12,8 @@ class InfiniteCarouselArrow extends Component {
           onClick={this.props.onClick}
       >
         <a
-          className='icon'
-          href='#'
+            className='icon'
+            href='#'
         >
           { this.props.next ? 'Next' : 'Previous' }
           <span className='icon-right'/>

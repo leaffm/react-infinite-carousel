@@ -3,13 +3,12 @@ import React, {
   PropTypes,
   Children
 } from 'react';
-import ReactDOM from 'react-dom';
-
-import {getElementWidth, getElementHeight} from '../common/helpers';
+import ResponsiveMixin from 'react-responsive-mixin';
+import {getElementWidth} from '../common/helpers';
 import InfiniteCarouselArrow from './InfiniteCarouselArrow';
 import InfiniteCarouselDots from './InfiniteCarouselDots';
 
-import styles from './InfiniteCarousel.css';
+//import styles from './InfiniteCarousel.css';
 
 class InfiniteCarousel extends Component {
 
@@ -72,7 +71,7 @@ class InfiniteCarousel extends Component {
     this.setDimensions();
 
     if (!window) {
-      return
+      return;
     }
     if (window.addEventListener) {
       window.addEventListener('resize', this.onWindowResized);
@@ -150,7 +149,7 @@ class InfiniteCarousel extends Component {
     start = children.length + this.props.slidesToShow;
     if (currentIndex === 0 && this.state.lazyLoadedList.indexOf(0) < 0) {
       limit = start + this.props.slidesToShow - 1;
-      for (var index = start; index <= limit; index++) {
+      for (let index = start; index <= limit; index++) {
         lazyLoadedList.push(index);
       }
     }
@@ -158,7 +157,7 @@ class InfiniteCarousel extends Component {
     start = 0;
     if (currentIndex === children.length - this.props.slidesToShow && this.state.lazyLoadedList.indexOf(children.length + this.props.slidesToShow - 1) < 0) {
       limit = start + this.props.slidesToShow - 1;
-      for (var index = start; index <= limit; index++) {
+      for (let index = start; index <= limit; index++) {
         lazyLoadedList.push(index);
       }
     }
@@ -166,7 +165,7 @@ class InfiniteCarousel extends Component {
     start = currentIndex + this.props.slidesToShow;
     limit = start + (this.props.slidesToShow - 1);
 
-    for (var index = start; index <= limit; index++) {
+    for (let index = start; index <= limit; index++) {
       if (this.state.lazyLoadedList.indexOf(index) < 0) {
         lazyLoadedList.push(index);
       }
@@ -180,19 +179,21 @@ class InfiniteCarousel extends Component {
       if (!this.props.lazyLoad || lazyLoadedList.indexOf(index) >= 0) {
         return (
           <li
-            className='CarouselSlide'
-            style={this.getSlideStyles()}
-            key={index}>
-              {child}
+              className={'CarouselSlide'}
+              key={index}
+              style={this.getSlideStyles()}
+          >
+          {child}
           </li>
         );
       } else {
         return (
           <li
-            className='CarouselSlide'
-            style={this.getSlideStyles()}
-            key={index}>
-              <img src='data:image/gif;base64,R0lGODlhAQABAIABAEdJRgAAACwAAAAAAQABAAACAkQBAA==' />
+              className={'CarouselSlide'}
+              key={index}
+              style={this.getSlideStyles()}
+          >
+          <img src='data:image/gif;base64,R0lGODlhAQABAIABAEdJRgAAACwAAAAAAQABAAACAkQBAA==' />
           </li>
         );
       }
@@ -294,7 +295,7 @@ class InfiniteCarousel extends Component {
 
   onDotClick = (event) => {
     event.preventDefault();
-    var targetIndex = event.target.parentElement.getAttribute('data-index');
+    const targetIndex = event.target.parentElement.getAttribute('data-index');
     const currentIndex = this.getTargetIndex(targetIndex * this.props.slidesToShow, this.props.slidesToShow);
     this.handleTrack(targetIndex * this.props.slidesToShow, currentIndex);
   };
@@ -305,47 +306,47 @@ class InfiniteCarousel extends Component {
     if (this.props.arrows) {
       prevArrow = (
         <InfiniteCarouselArrow 
-          next={false}
-          onClick={this.moveToPrevious}
+            next={false}
+            onClick={this.moveToPrevious}
         />
-      );
+        );
 
       nextArrow = (
         <InfiniteCarouselArrow 
-          onClick={this.moveToNext}
+            onClick={this.moveToNext}
         />
-      );
+        );
     }
 
     if (this.props.dots) {
       dots = (
         <InfiniteCarouselDots
-          numberOfDots={this.state.slidePages}
-          onClick={this.onDotClick}
-          activePage={this.state.activePage}
+            activePage={this.state.activePage}
+            numberOfDots={this.state.slidePages}
+            onClick={this.onDotClick}
         />
-      );
+        );
     }
 
     const children = this.getFormatedChildren(this.state.children, this.state.lazyLoadedList);
 
     return (
       <div className='Carousel'>
-        {prevArrow}
-        <div 
+      {prevArrow}
+      <div 
           className={'CarouselFrame'}
           ref='frame'
-        >
-          <ul 
-            className={'CarouselTrack'}
-            style={this.getTrackStyles()}
-            ref='track'
-          >
-            {children}
-          </ul>
-        </div>
-        {nextArrow}
-        {dots}
+      >
+      <ul 
+          className={'CarouselTrack'}
+          ref='track'
+          style={this.getTrackStyles()}
+      >
+      {children}
+      </ul>
+      </div>
+      {nextArrow}
+      {dots}
       </div>
     );
   }

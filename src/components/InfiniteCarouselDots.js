@@ -14,23 +14,23 @@ class InfiniteCarouselDots extends Component {
     for (let i=0; i < this.props.numberOfDots; i++) {
       dots.push(
         <li 
-          key={i + 1}
-          data-index={i}
-          className={ i === this.props.activePage ? 'active' : ''}
+            className={i === this.props.activePage ? 'active' : ''}
+            data-index={i}
+            key={i + 1}
         >
-          <a 
+        <a 
             href='#'
             onClick={this.props.onClick}
-          >
-            {i + 1}
-          </a>
+        >
+        {i + 1}
+        </a>
         </li>
-      );
+        );
     }
 
     return (
       <ul className='dots'>
-        {dots}
+      {dots}
       </ul>
     );
   }

@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Image from './components/Image.js';
 import InfiniteCarousel from './components/InfiniteCarousel.js';
 
 ReactDOM.render(
