@@ -8,7 +8,7 @@ import {getElementWidth} from '../common/helpers';
 import InfiniteCarouselArrow from './InfiniteCarouselArrow';
 import InfiniteCarouselDots from './InfiniteCarouselDots';
 
-//import styles from './InfiniteCarousel.css';
+import styles from './InfiniteCarousel.css';
 
 class InfiniteCarousel extends Component {
 
