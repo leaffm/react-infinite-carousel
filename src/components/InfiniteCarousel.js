@@ -3,7 +3,7 @@ import React, {
   PropTypes,
   Children
 } from 'react';
-import ResponsiveMixin from 'react-responsive-mixin';
+import {media} from 'react-responsive-mixin';
 import {getElementWidth} from '../common/helpers';
 import InfiniteCarouselArrow from './InfiniteCarouselArrow';
 import InfiniteCarouselDots from './InfiniteCarouselDots';
@@ -14,9 +14,9 @@ class InfiniteCarousel extends Component {
 
   static propTypes = {
     object: PropTypes.object,
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.arrayOf(React.PropTypes.node),
-      React.PropTypes.node
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(React.PropTypes.node),
+      PropTypes.node
     ]).isRequired,
     infinite: PropTypes.bool,
     lazyLoad: PropTypes.bool,
@@ -26,7 +26,9 @@ class InfiniteCarousel extends Component {
     slidesToScroll: PropTypes.number,
     slidesSpacing: PropTypes.number,
     autoCycle: PropTypes.bool,
-    cycleInterval: PropTypes.number
+    cycleInterval: PropTypes.number,
+    responsive: PropTypes.bool,
+    breakpoints: PropTypes.arrayOf(PropTypes.object)
   };
 
   static defaultProps = {
@@ -35,11 +37,26 @@ class InfiniteCarousel extends Component {
     lazyLoad: true,
     arrows: true,
     dots: true,
-    slidesToShow: 3,
+    slidesToShow: 4,
     slidesToScroll: 1,
     slidesSpacing: 10,
     autoCycle: false,
-    cycleInterval: 500
+    cycleInterval: 500,
+    responsive: true,
+    breakpoints: [
+      { 
+        breakpoint : 400,
+        settings: {
+          slidesToShow: 2
+        }
+      },
+      { 
+        breakpoint : 768,
+        settings: {
+          slidesToShow: 3
+        }
+      }
+    ]
   };
 
   constructor(props) {
@@ -59,12 +76,16 @@ class InfiniteCarousel extends Component {
       frameWidth: 1,
       
       children: [],
-      lazyLoadedList: []
+      lazyLoadedList: [],
+
+      settings: {},
+
+      breakpoints: {}
     };
   }
 
   componentWillMount() {
-    this.setChildren();
+    this.init();
   }
 
   componentDidMount() {
@@ -80,22 +101,28 @@ class InfiniteCarousel extends Component {
     }
   }
 
+  init = () => {
+    const settings = Object.assign({}, this.defaultProps, this.props);
+    const children = this.getChildrenList(this.props.children, this.props.slidesToShow);
+    this.setState({
+      children,
+      settings
+    });
+
+    if (this.props.responsive) {
+      this.setupBreakpointSettings(this.props.breakpoints);
+    }
+  };
+
   onWindowResized = () => {
     this.setDimensions();
   };
 
-  setChildren = () => {
-    const children = this.getChildrenList(this.props.children, this.props.slidesToShow);
-    
-    this.setState({
-      children
-    });
-  };
-
   getTrackStyles = () => {
-    const trackWidth = (this.state.slidesWidth + (this.props.slidesSpacing * 2)) * (this.state.slidesCount + this.props.slidesToShow * 2);
-    const totalSlideWidth = this.state.slidesWidth + (this.props.slidesSpacing * 2);
-    const initialTrackPostion = totalSlideWidth * this.props.slidesToShow;
+    const settings = this.state.settings;
+    const trackWidth = (this.state.slidesWidth + (settings.slidesSpacing * 2)) * (this.state.slidesCount + settings.slidesToShow * 2);
+    const totalSlideWidth = this.state.slidesWidth + (settings.slidesSpacing * 2);
+    const initialTrackPostion = totalSlideWidth * settings.slidesToShow;
     const trackPosition = initialTrackPostion + (totalSlideWidth * this.state.currentIndex);
     const transition = this.state.animating ? `transform 500ms ease` : '';
 
@@ -124,12 +151,37 @@ class InfiniteCarousel extends Component {
     };
   };
 
+  setupBreakpointSettings = (breakpointsSettings) => {
+    let breakpoints =  breakpointsSettings.map(element => element.breakpoint);
+    if (breakpoints.length > 0) {
+      breakpoints.sort().reverse();
+      // Register responsive media queries in props
+      breakpointsSettings.forEach(element => {
+        const query = { maxWidth : element.breakpoint};
+        media(query, () => {
+          this.setState({
+            settings: Object.assign({}, this.defaultProps, this.props, element.settings)
+          });
+        });
+      });
+
+      // Register media query for full screen. Need to support resize from small to large
+      const query = {minWidth: (breakpoints[0] + 1)};
+      media(query, () => {
+        this.setState({
+          settings: Object.assign({}, this.defaultProps, this.props)
+        });
+      });
+    }
+  };
+
   setDimensions = () => {
+    const settings = this.state.settings;
     const childrenCount = Children.count(this.props.children);
     const slidesCount = Children.count(this.state.children);
     const frameWidth = getElementWidth(this.refs.frame);
-    const slidesWidth = (frameWidth / this.props.slidesToShow) - (this.props.slidesSpacing * 2);
-    const slidePages = this.props.children.length > this.props.slidesToShow ? Math.ceil(this.props.children.length / this.props.slidesToShow) : 1;
+    const slidesWidth = (frameWidth / settings.slidesToShow) - (settings.slidesSpacing * 2);
+    const slidePages = this.props.children.length > settings.slidesToShow ? Math.ceil(this.props.children.length / settings.slidesToShow) : 1;
     const lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, this.state.currentIndex);
 
     this.setState({
@@ -145,25 +197,26 @@ class InfiniteCarousel extends Component {
   getLazyLoadedIndexes = (children, currentIndex) => {
     let lazyLoadedList = this.state.lazyLoadedList;
     let start, limit;
+    const settings = this.state.settings;
 
-    start = children.length + this.props.slidesToShow;
+    start = children.length + settings.slidesToShow;
     if (currentIndex === 0 && this.state.lazyLoadedList.indexOf(0) < 0) {
-      limit = start + this.props.slidesToShow - 1;
+      limit = start + settings.slidesToShow - 1;
       for (let index = start; index <= limit; index++) {
         lazyLoadedList.push(index);
       }
     }
 
     start = 0;
-    if (currentIndex === children.length - this.props.slidesToShow && this.state.lazyLoadedList.indexOf(children.length + this.props.slidesToShow - 1) < 0) {
-      limit = start + this.props.slidesToShow - 1;
+    if (currentIndex === children.length - settings.slidesToShow && this.state.lazyLoadedList.indexOf(children.length + settings.slidesToShow - 1) < 0) {
+      limit = start + settings.slidesToShow - 1;
       for (let index = start; index <= limit; index++) {
         lazyLoadedList.push(index);
       }
     }
 
-    start = currentIndex + this.props.slidesToShow;
-    limit = start + (this.props.slidesToShow - 1);
+    start = currentIndex + settings.slidesToShow;
+    limit = start + (settings.slidesToShow - 1);
 
     for (let index = start; index <= limit; index++) {
       if (this.state.lazyLoadedList.indexOf(index) < 0) {
@@ -176,7 +229,7 @@ class InfiniteCarousel extends Component {
 
   getFormatedChildren = (children, lazyLoadedList) => {
     return React.Children.map(children, (child, index)  => {
-      if (!this.props.lazyLoad || lazyLoadedList.indexOf(index) >= 0) {
+      if (!this.state.settings.lazyLoad || lazyLoadedList.indexOf(index) >= 0) {
         return (
           <li
               className={'CarouselSlide'}
@@ -246,7 +299,8 @@ class InfiniteCarousel extends Component {
       }, 500);
     };
 
-    const activePage = Math.ceil(currentIndex / this.props.slidesToShow);
+    const settings = this.state.settings;
+    const activePage = Math.ceil(currentIndex / settings.slidesToShow);
     const lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, currentIndex);
 
     if (targetIndex < 0) {
@@ -278,15 +332,17 @@ class InfiniteCarousel extends Component {
 
   moveToNext = (event) => {
     event.preventDefault();
-    const targetIndex = this.state.currentIndex + this.props.slidesToScroll;
-    const currentIndex = this.getTargetIndex(targetIndex, this.props.slidesToScroll);
+    const settings = this.state.settings;
+    const targetIndex = this.state.currentIndex + settings.slidesToScroll;
+    const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
     this.handleTrack(targetIndex, currentIndex);
   };
 
   moveToPrevious = (event) => {
     event.preventDefault();
-    let targetIndex = this.state.currentIndex - this.props.slidesToScroll;
-    const currentIndex = this.getTargetIndex(targetIndex, this.props.slidesToScroll);
+    const settings = this.state.settings;
+    let targetIndex = this.state.currentIndex - settings.slidesToScroll;
+    const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
     if (targetIndex < 0 && this.state.currentIndex !== 0) {
       targetIndex = 0;
     }
@@ -295,15 +351,16 @@ class InfiniteCarousel extends Component {
 
   onDotClick = (event) => {
     event.preventDefault();
+    const settings = this.state.settings;
     const targetIndex = event.target.parentElement.getAttribute('data-index');
-    const currentIndex = this.getTargetIndex(targetIndex * this.props.slidesToShow, this.props.slidesToShow);
-    this.handleTrack(targetIndex * this.props.slidesToShow, currentIndex);
+    const currentIndex = this.getTargetIndex(targetIndex * settings.slidesToShow, settings.slidesToShow);
+    this.handleTrack(targetIndex * settings.slidesToShow, currentIndex);
   };
 
   render() {
     let prevArrow, nextArrow, dots;
 
-    if (this.props.arrows) {
+    if (this.state.settings.arrows) {
       prevArrow = (
         <InfiniteCarouselArrow 
             next={false}
@@ -318,7 +375,7 @@ class InfiniteCarousel extends Component {
         );
     }
 
-    if (this.props.dots) {
+    if (this.state.settings.dots) {
       dots = (
         <InfiniteCarouselDots
             activePage={this.state.activePage}
