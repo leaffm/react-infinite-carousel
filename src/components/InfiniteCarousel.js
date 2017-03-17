@@ -26,6 +26,7 @@ class InfiniteCarousel extends Component {
     slidesToScroll: PropTypes.number,
     slidesSpacing: PropTypes.number,
     autoCycle: PropTypes.bool,
+    pauseOnHover: PropTypes.bool,
     cycleInterval: PropTypes.number,
     responsive: PropTypes.bool,
     breakpoints: PropTypes.arrayOf(PropTypes.object)
@@ -37,11 +38,12 @@ class InfiniteCarousel extends Component {
     lazyLoad: true,
     arrows: true,
     dots: true,
-    slidesToShow: 4,
-    slidesToScroll: 1,
+    slidesToShow: 10,
+    slidesToScroll: 10,
     slidesSpacing: 10,
     autoCycle: false,
-    cycleInterval: 500,
+    cycleInterval: 5000,
+    pauseOnHover: true,
     responsive: true,
     breakpoints: [
       { 
@@ -66,21 +68,16 @@ class InfiniteCarousel extends Component {
     this.state = {
       currentIndex: 0,
       activePage: 0,
-      
+      children: [],
+      lazyLoadedList: [],
       childrenCount: 0,
-      
       slidesCount: 0,
       slidesWidth: 1,
       slidePages: 1,
-      
       frameWidth: 1,
-      
-      children: [],
-      lazyLoadedList: [],
-
       settings: {},
-
-      breakpoints: {}
+      breakpoints: {},
+      autoCycleTimer: null
     };
   }
 
@@ -98,6 +95,24 @@ class InfiniteCarousel extends Component {
       window.addEventListener('resize', this.onWindowResized);
     } else {
       window.attachEvent('onresize', this.onWindowResized);
+    }
+
+    if (this.props.autoCycle) {
+      const autoCycleTimer = setInterval(this.playAutoCycle, this.props.cycleInterval);
+      this.setState({
+        autoCycleTimer
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    if (window.addEventListener) {
+      window.removeEventListener('resize', this.onWindowResized);
+    } else {
+      window.detachEvent('onresize', this.onWindowResized);
+    }
+    if (this.state.autoCycleTimer) {
+      clearInterval(this.state.autoCycleTimer);
     }
   }
 
@@ -356,6 +371,40 @@ class InfiniteCarousel extends Component {
     const currentIndex = this.getTargetIndex(targetIndex * settings.slidesToShow, settings.slidesToShow);
     this.handleTrack(targetIndex * settings.slidesToShow, currentIndex);
   };
+
+  playAutoCycle = () => {
+    let nextPage = this.state.activePage + 1;
+    const settings = this.state.settings;
+    if (nextPage == this.state.slidePages - 1) {
+      nextPage = 0;
+    }
+    const currentIndex = this.getTargetIndex(nextPage * settings.slidesToShow, settings.slidesToShow);
+    this.handleTrack(nextPage * settings.slidesToShow, currentIndex);
+  };
+
+  onMouseEnter = (e) => {
+    if (this.props.autoCycle && this.props.pauseOnHover) {
+      this.pauseAutoCycle();
+    }
+  };
+
+  onMouseOver = (e) => {
+    if (this.props.autoCycle && this.props.pauseOnHover) {
+      this.pauseAutoCycle();
+    }
+  };
+
+  onMouseLeave = (e) => {
+    if (this.props.autoCycle && this.props.pauseOnHover) {
+      this.playAutoCycle();
+    }
+  };
+
+  onSwipeStart = (event) => {};
+
+  onSwipeMove = (event) => {};
+
+  onSwipeEnd = (event) => {};
 
   render() {
     let prevArrow, nextArrow, dots;

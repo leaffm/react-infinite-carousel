@@ -53,6 +53,78 @@ ReactDOM.render(
       </div>
       <h3>{'This is a title'}</h3>
     </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
+    <div>
+      <div>
+        <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
+      </div>
+      <h3>{'This is a title'}</h3>
+    </div>
 	</InfiniteCarousel>, 
 
 	document.getElementById('root'));
