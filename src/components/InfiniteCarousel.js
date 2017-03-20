@@ -37,28 +37,15 @@ class InfiniteCarousel extends Component {
     infinite: true,
     lazyLoad: true,
     arrows: true,
-    dots: true,
-    slidesToShow: 10,
-    slidesToScroll: 10,
+    dots: false,
+    slidesToShow: 1,
+    slidesToScroll: 1,
     slidesSpacing: 10,
     autoCycle: false,
     cycleInterval: 5000,
     pauseOnHover: true,
     responsive: true,
-    breakpoints: [
-      { 
-        breakpoint : 400,
-        settings: {
-          slidesToShow: 2
-        }
-      },
-      { 
-        breakpoint : 768,
-        settings: {
-          slidesToShow: 3
-        }
-      }
-    ]
+    breakpoints: []
   };
 
   constructor(props) {
@@ -98,10 +85,7 @@ class InfiniteCarousel extends Component {
     }
 
     if (this.props.autoCycle) {
-      const autoCycleTimer = setInterval(this.playAutoCycle, this.props.cycleInterval);
-      this.setState({
-        autoCycleTimer
-      });
+      this.playAutoCycle();
     }
   }
 
@@ -372,14 +356,36 @@ class InfiniteCarousel extends Component {
     this.handleTrack(targetIndex * settings.slidesToShow, currentIndex);
   };
 
-  playAutoCycle = () => {
-    let nextPage = this.state.activePage + 1;
+  autoCycle = () => {
+    /*let nextPage = this.state.activePage + 1;
     const settings = this.state.settings;
     if (nextPage == this.state.slidePages - 1) {
       nextPage = 0;
     }
     const currentIndex = this.getTargetIndex(nextPage * settings.slidesToShow, settings.slidesToShow);
-    this.handleTrack(nextPage * settings.slidesToShow, currentIndex);
+    this.handleTrack(nextPage * settings.slidesToShow, currentIndex);*/
+    const settings = this.state.settings;
+    const targetIndex = this.state.currentIndex + settings.slidesToScroll;
+    const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
+    this.handleTrack(targetIndex, currentIndex);
+  };
+
+  playAutoCycle = () => {
+    if (this.props.autoCycle) {
+      const autoCycleTimer = setInterval(this.autoCycle, this.props.cycleInterval);
+      this.setState({
+        autoCycleTimer
+      });
+    }
+  };
+
+  pauseAutoCycle = () => {
+    if (this.state.autoCycleTimer) {
+      clearInterval(this.state.autoCycleTimer);
+      this.setState({
+        autoCycleTimer: null
+      });
+    }
   };
 
   onMouseEnter = (e) => {
@@ -437,7 +443,12 @@ class InfiniteCarousel extends Component {
     const children = this.getFormatedChildren(this.state.children, this.state.lazyLoadedList);
 
     return (
-      <div className='Carousel'>
+      <div 
+          className='Carousel'
+          onMouseEnter={this.onMouseEnter}
+          onMouseLeave={this.onMouseLeave}
+          onMouseOver={this.onMouseOver}
+      >
       {prevArrow}
       <div 
           className={'CarouselFrame'}

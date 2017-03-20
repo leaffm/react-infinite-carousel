@@ -4,7 +4,25 @@ import ReactDOM from 'react-dom';
 import InfiniteCarousel from './components/InfiniteCarousel.js';
 
 ReactDOM.render(
-	<InfiniteCarousel>
+	<InfiniteCarousel
+      dots={true}
+      slidesToShow={4}
+      slidesToScroll={4}
+      breakpoints={[
+        { 
+          breakpoint : 400,
+          settings: {
+            slidesToShow: 2
+          }
+        },
+        { 
+          breakpoint : 768,
+          settings: {
+            slidesToShow: 3
+          }
+        }
+      ]}
+  >
 		<div>
       <div>
         <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=55b64e&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
