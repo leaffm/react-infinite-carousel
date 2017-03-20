@@ -20,6 +20,7 @@ class InfiniteCarousel extends Component {
     ]).isRequired,
     infinite: PropTypes.bool,
     lazyLoad: PropTypes.bool,
+    swipe: PropTypes.bool,
     arrows: PropTypes.bool,
     dots: PropTypes.bool,
     slidesToShow: PropTypes.number,
@@ -36,6 +37,8 @@ class InfiniteCarousel extends Component {
     object: null,
     infinite: true,
     lazyLoad: true,
+    swipe: true,
+    draggable: true,
     arrows: true,
     dots: false,
     slidesToShow: 1,
@@ -64,7 +67,16 @@ class InfiniteCarousel extends Component {
       frameWidth: 1,
       settings: {},
       breakpoints: {},
-      autoCycleTimer: null
+      autoCycleTimer: null,
+      dragging: false,
+      touchObject: {
+        startX: 0,
+        startY: 0,
+        endX: 0,
+        endY: 0,
+        length: 0,
+        direction: -1
+      }
     };
   }
 
@@ -119,11 +131,14 @@ class InfiniteCarousel extends Component {
 
   getTrackStyles = () => {
     const settings = this.state.settings;
+    const touchObject = this.state.touchObject;
+
     const trackWidth = (this.state.slidesWidth + (settings.slidesSpacing * 2)) * (this.state.slidesCount + settings.slidesToShow * 2);
     const totalSlideWidth = this.state.slidesWidth + (settings.slidesSpacing * 2);
     const initialTrackPostion = totalSlideWidth * settings.slidesToShow;
-    const trackPosition = initialTrackPostion + (totalSlideWidth * this.state.currentIndex);
     const transition = this.state.animating ? `transform 500ms ease` : '';
+    const touchOffset = this.props.swipe && this.state.touchObject.length !== 0 ? touchObject.length * touchObject.direction : 0;
+    const trackPosition = initialTrackPostion + (totalSlideWidth * this.state.currentIndex) + touchOffset;
 
     return {
       position: 'relative',
@@ -293,6 +308,23 @@ class InfiniteCarousel extends Component {
       setTimeout(() => {
         this.setState({
           currentIndex: currentIndex,
+          animating: false,
+          dragging: false,
+          touchObject : {
+            startX: 0,
+            startY: 0,
+            endX: 0,
+            endY: 0,
+            length: 0,
+            direction: -1
+          }
+        });
+      }, 500);
+    };
+
+    const stopAnimation = () => {
+      setTimeout(() => {
+        this.setState({
           animating: false
         });
       }, 500);
@@ -324,8 +356,17 @@ class InfiniteCarousel extends Component {
         currentIndex: currentIndex,
         activePage,
         animating: true,
-        lazyLoadedList
-      });
+        lazyLoadedList,
+        dragging: false,
+        touchObject : {
+          startX: 0,
+          startY: 0,
+          endX: 0,
+          endY: 0,
+          length: 0,
+          direction: -1
+        }
+      }, stopAnimation);
     }
   };
 
@@ -357,13 +398,6 @@ class InfiniteCarousel extends Component {
   };
 
   autoCycle = () => {
-    /*let nextPage = this.state.activePage + 1;
-    const settings = this.state.settings;
-    if (nextPage == this.state.slidePages - 1) {
-      nextPage = 0;
-    }
-    const currentIndex = this.getTargetIndex(nextPage * settings.slidesToShow, settings.slidesToShow);
-    this.handleTrack(nextPage * settings.slidesToShow, currentIndex);*/
     const settings = this.state.settings;
     const targetIndex = this.state.currentIndex + settings.slidesToScroll;
     const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
@@ -406,11 +440,98 @@ class InfiniteCarousel extends Component {
     }
   };
 
-  onSwipeStart = (event) => {};
+  getSwipeDirection = (x1, x2, y1, y2) => {
+    const xDist = x1 - x2;
+    const yDist = y1 - y2;
 
-  onSwipeMove = (event) => {};
+    let swipeAngle = Math.round(Math.atan2(yDist, xDist) * 180 / Math.PI);
 
-  onSwipeEnd = (event) => {};
+    if (swipeAngle < 0) {
+      swipeAngle = 360 - Math.abs(swipeAngle);
+    }
+    if ((swipeAngle <= 45) && (swipeAngle >= 0)) {
+      return 1;
+    }
+    if ((swipeAngle <= 360) && (swipeAngle >= 315)) {
+      return 1;
+    }
+    if ((swipeAngle >= 135) && (swipeAngle <= 225)) {
+      return -1;
+    }
+    return 0;
+  };
+
+  onSwipeStart = (e) => {
+    if ((this.props.swipe === false) || ('ontouchend' in document && this.props.swipe === false)) {
+      return;
+    } else if (this.props.draggable === false && e.type.indexOf('mouse') !== -1) {
+      return;
+    }
+
+    const startX = (e.touches !== undefined) ? e.touches[0].pageX : e.clientX;
+    const startY = (e.touches !== undefined) ? e.touches[0].pageY : e.clientY;
+    
+    this.setState({
+      dragging: true,
+      //animating: true,
+      touchObject: {
+        startX,
+        startY
+      }
+    });
+  };
+
+  onSwipeMove = (e) => {
+    if (!this.state.dragging) {
+      e.preventDefault();
+      return;
+    }
+    if (this.state.animating) {
+      return;
+    }
+    const curX = (e.touches !== undefined) ? e.touches[0].pageX : e.clientX;
+    const curY = (e.touches !== undefined) ? e.touches[0].pageY : e.clientY;
+    const touchObject = this.state.touchObject;
+    const direction = this.getSwipeDirection(touchObject.startX, curX, touchObject.startY, curY);
+
+    if (direction !== 0) {
+      e.preventDefault();
+    }
+
+    const swipeLength = Math.round(Math.sqrt(Math.pow(curX - touchObject.startX, 2)));
+
+    this.setState({
+      touchObject : {
+        startX: touchObject.startX,
+        startY: touchObject.startY,
+        endX: curX,
+        endY: curY,
+        length: swipeLength,
+        direction: direction
+      }
+    });
+  };
+
+  onSwipeEnd = (e) => {
+    if (this.state.touchObject.length !== 0 && this.state.touchObject.length > this.state.slidesWidth / 2) {
+      if (this.state.touchObject.direction === 1) {
+        // Next
+        const settings = this.state.settings;
+        const targetIndex = this.state.currentIndex + settings.slidesToScroll;
+        const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
+        this.handleTrack(targetIndex, currentIndex);
+      } else {
+        // Previous
+        const settings = this.state.settings;
+        let targetIndex = this.state.currentIndex - settings.slidesToScroll;
+        const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
+        if (targetIndex < 0 && this.state.currentIndex !== 0) {
+          targetIndex = 0;
+        }
+        this.handleTrack(targetIndex, currentIndex);
+      }
+    }
+  };
 
   render() {
     let prevArrow, nextArrow, dots;
@@ -454,13 +575,21 @@ class InfiniteCarousel extends Component {
           className={'CarouselFrame'}
           ref='frame'
       >
-      <ul 
-          className={'CarouselTrack'}
-          ref='track'
-          style={this.getTrackStyles()}
-      >
-      {children}
-      </ul>
+        <ul 
+            className={'CarouselTrack'}
+            ref='track'
+            style={this.getTrackStyles()}
+            onMouseDown={this.onSwipeStart}
+            onMouseMove={this.state.dragging ? this.onSwipeMove: null}
+            onMouseUp={this.onSwipeEnd}
+            onMouseLeave={this.state.dragging ? this.onSwipeEnd: null}
+            onTouchStart={this.onSwipeStart}
+            onTouchMove={this.state.dragging ? this.onSwipeMove: null}
+            onTouchEnd={this.onSwipeEnd}
+            onTouchCancel={this.state.dragging ? this.onSwipeEnd: null}
+        >
+          {children}
+        </ul>
       </div>
       {nextArrow}
       {dots}
