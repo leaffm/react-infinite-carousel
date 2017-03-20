@@ -372,6 +372,9 @@ class InfiniteCarousel extends Component {
 
   moveToNext = (event) => {
     event.preventDefault();
+    if (this.state.animating) {
+      return;
+    }
     const settings = this.state.settings;
     const targetIndex = this.state.currentIndex + settings.slidesToScroll;
     const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
@@ -380,6 +383,9 @@ class InfiniteCarousel extends Component {
 
   moveToPrevious = (event) => {
     event.preventDefault();
+    if (this.state.animating) {
+      return;
+    }
     const settings = this.state.settings;
     let targetIndex = this.state.currentIndex - settings.slidesToScroll;
     const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
@@ -391,6 +397,9 @@ class InfiniteCarousel extends Component {
 
   onDotClick = (event) => {
     event.preventDefault();
+    if (this.state.animating) {
+      return;
+    }
     const settings = this.state.settings;
     const targetIndex = event.target.parentElement.getAttribute('data-index');
     const currentIndex = this.getTargetIndex(targetIndex * settings.slidesToShow, settings.slidesToShow);
