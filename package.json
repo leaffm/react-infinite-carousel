@@ -2,7 +2,6 @@
   "name": "react-infinite-carousel",
   "version": "1.0.0",
   "description": "React simple infinite carousel with lazy loading and responsive support",
-  "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -49,6 +48,7 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.0",
+    "extract-text-webpack-plugin": "^2.1.0",
     "gm-base64": "^1.0.0",
     "html-webpack-plugin": "^2.28.0",
     "react-scripts": "^0.9.5",
