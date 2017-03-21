@@ -166,20 +166,30 @@ class InfiniteCarousel extends Component {
   };
 
   setupBreakpointSettings = (breakpointsSettings) => {
-    let breakpoints =  breakpointsSettings.map(element => element.breakpoint);
+    const breakpoints =  breakpointsSettings.map(element => element.breakpoint);
+    const settings = {};
+    breakpointsSettings.forEach(element => {
+      settings[element.breakpoint] = element.settings;
+    });
     if (breakpoints.length > 0) {
-      breakpoints.sort().reverse();
+      breakpoints.sort();
       // Register responsive media queries in props
-      breakpointsSettings.forEach(element => {
-        const query = { maxWidth : element.breakpoint};
+      breakpoints.forEach((element, index) => {
+        let query;
+        if (index === 0) {
+          query = {minWidth: 0, maxWidth: element};
+        } else {
+          query = {minWidth: breakpoints[index-1], maxWidth: element};
+        }
         media(query, () => {
           this.setState({
-            settings: Object.assign({}, this.defaultProps, this.props, element.settings)
+            settings: Object.assign({}, this.defaultProps, this.props, settings[element])
           });
         });
       });
 
       // Register media query for full screen. Need to support resize from small to large
+      breakpoints.reverse();
       const query = {minWidth: (breakpoints[0] + 1)};
       media(query, () => {
         this.setState({

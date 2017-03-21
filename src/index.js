@@ -10,7 +10,7 @@ ReactDOM.render(
       slidesToScroll={4}
       breakpoints={[
         { 
-          breakpoint : 400,
+          breakpoint : 500,
           settings: {
             slidesToShow: 2,
             slidesToScroll: 2
