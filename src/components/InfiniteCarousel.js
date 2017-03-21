@@ -208,12 +208,8 @@ class InfiniteCarousel extends Component {
     const slidePages = this.props.children.length > settings.slidesToShow ? Math.ceil(this.props.children.length / settings.slidesToShow) : 1;
     const lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, this.state.currentIndex);
     const activePage = Math.ceil(this.state.currentIndex / settings.slidesToShow);
-    console.log(activePage);
-    //const currentIndex =  this.getTargetIndex(this.state.currentIndex * settings.slidesToShow, settings.slidesToShow);
-    //const children = this.getChildrenList(this.props.children, settings.slidesToShow);
 
     this.setState({
-      //currentIndex,
       activePage,
       childrenCount,
       slidesCount,
@@ -221,7 +217,6 @@ class InfiniteCarousel extends Component {
       frameWidth,
       slidePages,
       lazyLoadedList
-      //children
     });
   };
 
@@ -254,8 +249,6 @@ class InfiniteCarousel extends Component {
         lazyLoadedList.push(index);
       }
     }
-
-    console.log(lazyLoadedList);
 
     return lazyLoadedList;
   };
