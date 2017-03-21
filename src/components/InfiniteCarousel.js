@@ -18,11 +18,11 @@ class InfiniteCarousel extends Component {
       PropTypes.arrayOf(React.PropTypes.node),
       PropTypes.node
     ]).isRequired,
-    infinite: PropTypes.bool,
     lazyLoad: PropTypes.bool,
     swipe: PropTypes.bool,
     arrows: PropTypes.bool,
     dots: PropTypes.bool,
+    animationDuration: PropTypes.number,
     slidesToShow: PropTypes.number,
     slidesToScroll: PropTypes.number,
     slidesSpacing: PropTypes.number,
@@ -35,12 +35,12 @@ class InfiniteCarousel extends Component {
 
   static defaultProps = {
     object: null,
-    infinite: true,
     lazyLoad: true,
     swipe: true,
     draggable: true,
     arrows: true,
     dots: false,
+    animationDuration: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
     slidesSpacing: 10,
@@ -135,9 +135,9 @@ class InfiniteCarousel extends Component {
 
     const trackWidth = (this.state.slidesWidth + (settings.slidesSpacing * 2)) * (this.state.slidesCount + settings.slidesToShow * 2);
     const totalSlideWidth = this.state.slidesWidth + (settings.slidesSpacing * 2);
-    const initialTrackPostion = totalSlideWidth * settings.slidesToShow;
-    const transition = this.state.animating ? `transform 500ms ease` : '';
-    const touchOffset = this.props.swipe && this.state.touchObject.length !== 0 ? touchObject.length * touchObject.direction : 0;
+    const initialTrackPostion = totalSlideWidth * this.props.slidesToShow;
+    const transition = this.state.animating ? `transform ${this.props.animationDuration}ms ease` : '';
+    const touchOffset = this.props.swipe && touchObject.length ? touchObject.length * touchObject.direction : 0;
     const trackPosition = initialTrackPostion + (totalSlideWidth * this.state.currentIndex) + touchOffset;
 
     return {
@@ -207,16 +207,21 @@ class InfiniteCarousel extends Component {
     const slidesWidth = (frameWidth / settings.slidesToShow) - (settings.slidesSpacing * 2);
     const slidePages = this.props.children.length > settings.slidesToShow ? Math.ceil(this.props.children.length / settings.slidesToShow) : 1;
     const lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, this.state.currentIndex);
-    const children = this.getChildrenList(this.props.children, settings.slidesToShow);
+    const activePage = Math.ceil(this.state.currentIndex / settings.slidesToShow);
+    console.log(activePage);
+    //const currentIndex =  this.getTargetIndex(this.state.currentIndex * settings.slidesToShow, settings.slidesToShow);
+    //const children = this.getChildrenList(this.props.children, settings.slidesToShow);
 
     this.setState({
+      //currentIndex,
+      activePage,
       childrenCount,
       slidesCount,
       slidesWidth,
       frameWidth,
       slidePages,
-      lazyLoadedList,
-      children
+      lazyLoadedList
+      //children
     });
   };
 
@@ -225,7 +230,7 @@ class InfiniteCarousel extends Component {
     let start, limit;
     const settings = this.state.settings;
 
-    start = children.length + settings.slidesToShow;
+    start = children.length + this.props.slidesToShow;
     if (currentIndex === 0 && this.state.lazyLoadedList.indexOf(0) < 0) {
       limit = start + settings.slidesToShow - 1;
       for (let index = start; index <= limit; index++) {
@@ -241,7 +246,7 @@ class InfiniteCarousel extends Component {
       }
     }
 
-    start = currentIndex + settings.slidesToShow;
+    start = currentIndex + this.props.slidesToShow;
     limit = start + (settings.slidesToShow - 1);
 
     for (let index = start; index <= limit; index++) {
@@ -249,6 +254,8 @@ class InfiniteCarousel extends Component {
         lazyLoadedList.push(index);
       }
     }
+
+    console.log(lazyLoadedList);
 
     return lazyLoadedList;
   };
@@ -321,25 +328,18 @@ class InfiniteCarousel extends Component {
         this.setState({
           currentIndex: currentIndex,
           animating: false,
-          dragging: false,
-          touchObject : {
-            startX: 0,
-            startY: 0,
-            endX: 0,
-            endY: 0,
-            length: 0,
-            direction: -1
-          }
+          dragging: false
         });
-      }, 500);
+      }, this.props.animationDuration);
     };
 
     const stopAnimation = () => {
       setTimeout(() => {
         this.setState({
-          animating: false
+          animating: false,
+          dragging: false
         });
-      }, 500);
+      }, this.props.animationDuration);
     };
 
     const settings = this.state.settings;
@@ -352,7 +352,15 @@ class InfiniteCarousel extends Component {
         currentIndex: targetIndex,
         activePage,
         animating: true,
-        lazyLoadedList
+        lazyLoadedList,
+        touchObject : {
+          startX: 0,
+          startY: 0,
+          endX: 0,
+          endY: 0,
+          length: 0,
+          direction: -1
+        }
       }, callback);
     } else if (targetIndex >= this.props.children.length) {
       // animar hacia el target index y en el callback setear el new index sin animación
@@ -360,7 +368,15 @@ class InfiniteCarousel extends Component {
         currentIndex: targetIndex,
         activePage,
         animating: true,
-        lazyLoadedList
+        lazyLoadedList,
+        touchObject : {
+          startX: 0,
+          startY: 0,
+          endX: 0,
+          endY: 0,
+          length: 0,
+          direction: -1
+        }
       }, callback);
     } else {
       // animar hacia el new index y setear el state
