@@ -1,16 +1,10 @@
+.Carousel {
+	position: relative;
+}
+
 .CarouselFrame {
 	width: 100%;
 	overflow: hidden;
-}
-
-.CarouselTrack {
-}
-
-.CarouselSlide {
-	position: relative;
-	float: left;
-	display: inline-block;
-	margin: 0 10px;
 }
 
 .CarouselSlide img {

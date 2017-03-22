@@ -5,9 +5,35 @@ import React, {
 
 class InfiniteCarouselDots extends Component {
 
-  getDotsStyle = () => {};
+  getDotsStyle = () => {
+    return {
+      position: 'absolute',
+      left: '50%',
+      bottom: '0',
+      padding: '0',
+      transform: 'translateX(-50%)'
+    };
+  };
 
-  getDotStyle = () => {};
+  getDotStyle = () => {
+    return {
+      display: 'inline-block',
+      listStyle: 'none',
+      margin: '0 10px',
+      cursor: 'pointer'
+    };
+  };
+
+  getIconStyle = (active) => {
+    const color = active ? '#48799a' : '#E5E5E5';
+    return {
+      display: 'block',
+      backgroundColor: color,
+      width: 20,
+      height: 20,
+      borderRadius: '50%'
+    };
+  };
 
   render() {
     let dots = [];
@@ -17,20 +43,23 @@ class InfiniteCarouselDots extends Component {
             className={i === this.props.activePage ? 'active' : ''}
             data-index={i}
             key={i + 1}
-        >
-        <a 
-            href='#'
             onClick={this.props.onClick}
+            style={this.getDotStyle()}
         >
-        {i + 1}
-        </a>
+          <i 
+            className='dot'
+            style={this.getIconStyle(i === this.props.activePage)}
+          />
         </li>
         );
     }
 
     return (
-      <ul className='dots'>
-      {dots}
+      <ul 
+          className='dots'
+          style={this.getDotsStyle()}
+      >
+        {dots}
       </ul>
     );
   }

@@ -161,7 +161,8 @@ class InfiniteCarousel extends Component {
       float: 'left',
       display: 'block',
       width: slidesWidth,
-      height: 'auto'
+      height: 'auto',
+      margin: `0 ${this.state.settings.slidesSpacing}px`
     };
   };
 
@@ -249,8 +250,6 @@ class InfiniteCarousel extends Component {
         lazyLoadedList.push(index);
       }
     }
-
-    console.log(lazyLoadedList);
 
     return lazyLoadedList;
   };
