@@ -25,7 +25,7 @@ class InfiniteCarouselArrow extends Component {
       display: 'inline-block',
       padding: '10px',
       border: 'solid #E5E5E5',
-      borderWidth: '0 10px 10px 0',
+      borderWidth: '0 5px 5px 0',
       transform: transform
     };
   };

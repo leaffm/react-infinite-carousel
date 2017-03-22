@@ -19,7 +19,7 @@ class InfiniteCarouselDots extends Component {
     return {
       display: 'inline-block',
       listStyle: 'none',
-      margin: '0 10px',
+      margin: '0 5px',
       cursor: 'pointer'
     };
   };
@@ -29,8 +29,8 @@ class InfiniteCarouselDots extends Component {
     return {
       display: 'block',
       backgroundColor: color,
-      width: 20,
-      height: 20,
+      width: 10,
+      height: 10,
       borderRadius: '50%'
     };
   };
