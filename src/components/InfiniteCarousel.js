@@ -235,7 +235,7 @@ class InfiniteCarousel extends Component {
 
     start = 0;
     if (currentIndex === children.length - settings.slidesToShow && this.state.lazyLoadedList.indexOf(children.length + settings.slidesToShow - 1) < 0) {
-      limit = start + settings.slidesToShow - 1;
+      limit = start + this.props.slidesToShow - 1;
       for (let index = start; index <= limit; index++) {
         lazyLoadedList.push(index);
       }
@@ -249,6 +249,8 @@ class InfiniteCarousel extends Component {
         lazyLoadedList.push(index);
       }
     }
+
+    console.log(lazyLoadedList);
 
     return lazyLoadedList;
   };
