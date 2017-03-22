@@ -37,7 +37,7 @@ class InfiniteCarousel extends Component {
     object: null,
     lazyLoad: true,
     swipe: true,
-    draggable: true,
+    draggable: false,
     arrows: true,
     dots: false,
     animationDuration: 500,
