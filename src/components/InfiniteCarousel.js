@@ -68,6 +68,7 @@ class InfiniteCarousel extends Component {
       settings: {},
       breakpoints: {},
       autoCycleTimer: null,
+      resizeTimer: null,
       dragging: false,
       touchObject: {
         startX: 0,
@@ -126,7 +127,8 @@ class InfiniteCarousel extends Component {
   };
 
   onWindowResized = () => {
-    this.setDimensions();
+    clearTimeout(this.resizeTimer);
+    this.resizeTimer = setTimeout(this.setDimensions, 100);
   };
 
   getTrackStyles = () => {
