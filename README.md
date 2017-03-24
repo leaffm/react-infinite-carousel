@@ -61,4 +61,4 @@ document.getElementById('root'));
 | pauseOnHover       | bool | Pauses autocycle | true |
 | responsive      	 | bool | Enables breakpoints | true |
 | breakpoints        | array | Array of objects in the form of ```{ breakpoint: int, settings: { ... } }```  | [] |
-| placeholderImageSrc| string | Go to slide on click | ```data:image/gif;base64,R0lGODlhAQABAIABAEdJRgAAACwAAAAAAQABAAACAkQBAA==``` |
+| placeholderImageSrc| string | Go to slide on click | base64 gif image 1x1 |
