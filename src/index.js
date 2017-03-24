@@ -87,5 +87,4 @@ ReactDOM.render(
       <img src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ed7ebe&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'/>
     </div>
 	</InfiniteCarousel>, 
-
-	document.getElementById('root'));
+document.getElementById('root'));
