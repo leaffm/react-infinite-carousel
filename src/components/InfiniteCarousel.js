@@ -4,7 +4,7 @@ import React, {
   Children
 } from 'react';
 import {media} from 'react-responsive-mixin';
-import {getElementWidth} from '../common/helpers';
+import {getElementWidth, getSwipeDirection} from '../common/helpers';
 import InfiniteCarouselArrow from './InfiniteCarouselArrow';
 import InfiniteCarouselDots from './InfiniteCarouselDots';
 
@@ -18,28 +18,30 @@ class InfiniteCarousel extends Component {
       PropTypes.arrayOf(React.PropTypes.node),
       PropTypes.node
     ]).isRequired,
-    lazyLoad: PropTypes.bool,
-    swipe: PropTypes.bool,
     arrows: PropTypes.bool,
     dots: PropTypes.bool,
+    lazyLoad: PropTypes.bool,
+    swipe: PropTypes.bool,
     animationDuration: PropTypes.number,
     slidesToShow: PropTypes.number,
     slidesToScroll: PropTypes.number,
     slidesSpacing: PropTypes.number,
     autoCycle: PropTypes.bool,
-    pauseOnHover: PropTypes.bool,
     cycleInterval: PropTypes.number,
+    pauseOnHover: PropTypes.bool,
     responsive: PropTypes.bool,
-    breakpoints: PropTypes.arrayOf(PropTypes.object)
+    breakpoints: PropTypes.arrayOf(PropTypes.object),
+    placeholderImageSrc: PropTypes.string
   };
 
   static defaultProps = {
     object: null,
+    children: [],
+    arrows: true,
+    dots: false,
     lazyLoad: true,
     swipe: true,
     draggable: false,
-    arrows: true,
-    dots: false,
     animationDuration: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
@@ -48,7 +50,8 @@ class InfiniteCarousel extends Component {
     cycleInterval: 5000,
     pauseOnHover: true,
     responsive: true,
-    breakpoints: []
+    breakpoints: [],
+    placeholderImageSrc: 'data:image/gif;base64,R0lGODlhAQABAIABAEdJRgAAACwAAAAAAQABAAACAkQBAA=='
   };
 
   constructor(props) {
@@ -97,7 +100,7 @@ class InfiniteCarousel extends Component {
       window.attachEvent('onresize', this.onWindowResized);
     }
 
-    if (this.props.autoCycle) {
+    if (this.state.settings.autoCycle) {
       this.playAutoCycle();
     }
   }
@@ -126,48 +129,6 @@ class InfiniteCarousel extends Component {
     }
   };
 
-  onWindowResized = () => {
-    clearTimeout(this.resizeTimer);
-    this.resizeTimer = setTimeout(this.setDimensions, 100);
-  };
-
-  getTrackStyles = () => {
-    const settings = this.state.settings;
-    const touchObject = this.state.touchObject;
-
-    const trackWidth = (this.state.slidesWidth + (settings.slidesSpacing * 2)) * (this.state.slidesCount + settings.slidesToShow * 2);
-    const totalSlideWidth = this.state.slidesWidth + (settings.slidesSpacing * 2);
-    const initialTrackPostion = totalSlideWidth * this.props.slidesToShow;
-    const transition = this.state.animating ? `transform ${this.props.animationDuration}ms ease` : '';
-    const touchOffset = this.props.swipe && touchObject.length ? touchObject.length * touchObject.direction : 0;
-    const trackPosition = initialTrackPostion + (totalSlideWidth * this.state.currentIndex) + touchOffset;
-
-    return {
-      position: 'relative',
-      display: 'block',
-      width: trackWidth,
-      height: 'auto',
-      padding: 0,
-      transition: transition,
-      transform: `translate(${-trackPosition}px, 0px)`,
-      boxSizing: 'border-box',
-      MozBoxSizing: 'border-box'
-    };
-  };
-
-  getSlideStyles = () => {
-    const slidesWidth = this.state.slidesWidth;
-
-    return {
-      position: 'relative',
-      float: 'left',
-      display: 'block',
-      width: slidesWidth,
-      height: 'auto',
-      margin: `0 ${this.state.settings.slidesSpacing}px`
-    };
-  };
-
   setupBreakpointSettings = (breakpointsSettings) => {
     const breakpoints =  breakpointsSettings.map(element => element.breakpoint);
     const settings = {};
@@ -176,7 +137,7 @@ class InfiniteCarousel extends Component {
     });
     if (breakpoints.length > 0) {
       breakpoints.sort();
-      // Register responsive media queries in props
+      // Register responsive media queries in settings
       breakpoints.forEach((element, index) => {
         let query;
         if (index === 0) {
@@ -191,7 +152,7 @@ class InfiniteCarousel extends Component {
         });
       });
 
-      // Register media query for full screen. Need to support resize from small to large
+      // Resize from small to large
       breakpoints.reverse();
       const query = {minWidth: (breakpoints[0] + 1)};
       media(query, () => {
@@ -256,32 +217,6 @@ class InfiniteCarousel extends Component {
     return lazyLoadedList;
   };
 
-  getFormatedChildren = (children, lazyLoadedList) => {
-    return React.Children.map(children, (child, index)  => {
-      if (!this.state.settings.lazyLoad || lazyLoadedList.indexOf(index) >= 0) {
-        return (
-          <li
-              className={'CarouselSlide'}
-              key={index}
-              style={this.getSlideStyles()}
-          >
-          {child}
-          </li>
-        );
-      } else {
-        return (
-          <li
-              className={'CarouselSlide'}
-              key={index}
-              style={this.getSlideStyles()}
-          >
-          <img src='data:image/gif;base64,R0lGODlhAQABAIABAEdJRgAAACwAAAAAAQABAAACAkQBAA==' />
-          </li>
-        );
-      }
-    });
-  };
-
   getChildrenList = (children, slidesToShow) => {
     if(!Array.isArray(children)) {
       children = [children];
@@ -319,6 +254,10 @@ class InfiniteCarousel extends Component {
   };
 
   handleTrack = (targetIndex, currentIndex) => {
+    const settings = this.state.settings;
+    const activePage = Math.ceil(currentIndex / settings.slidesToShow);
+    const lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, currentIndex);
+
     const callback = () => {
       setTimeout(() => {
         this.setState({
@@ -326,7 +265,7 @@ class InfiniteCarousel extends Component {
           animating: false,
           dragging: false
         });
-      }, this.props.animationDuration);
+      }, settings.animationDuration);
     };
 
     const stopAnimation = () => {
@@ -335,15 +274,10 @@ class InfiniteCarousel extends Component {
           animating: false,
           dragging: false
         });
-      }, this.props.animationDuration);
+      }, settings.animationDuration);
     };
 
-    const settings = this.state.settings;
-    const activePage = Math.ceil(currentIndex / settings.slidesToShow);
-    const lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, currentIndex);
-
     if (targetIndex < 0) {
-      // animar hacia el target index y en el callback setear el new index sin animación
       this.setState({
         currentIndex: targetIndex,
         activePage,
@@ -359,7 +293,6 @@ class InfiniteCarousel extends Component {
         }
       }, callback);
     } else if (targetIndex >= this.props.children.length) {
-      // animar hacia el target index y en el callback setear el new index sin animación
       this.setState({
         currentIndex: targetIndex,
         activePage,
@@ -375,7 +308,6 @@ class InfiniteCarousel extends Component {
         }
       }, callback);
     } else {
-      // animar hacia el new index y setear el state
       this.setState({
         currentIndex: currentIndex,
         activePage,
@@ -430,6 +362,11 @@ class InfiniteCarousel extends Component {
     this.handleTrack(targetIndex * settings.slidesToShow, currentIndex);
   };
 
+  onWindowResized = () => {
+    clearTimeout(this.resizeTimer);
+    this.resizeTimer = setTimeout(this.setDimensions, 100);
+  };
+
   autoCycle = () => {
     const settings = this.state.settings;
     const targetIndex = this.state.currentIndex + settings.slidesToScroll;
@@ -438,8 +375,8 @@ class InfiniteCarousel extends Component {
   };
 
   playAutoCycle = () => {
-    if (this.props.autoCycle) {
-      const autoCycleTimer = setInterval(this.autoCycle, this.props.cycleInterval);
+    if (this.state.settings.autoCycle) {
+      const autoCycleTimer = setInterval(this.autoCycle, this.state.settings.cycleInterval);
       this.setState({
         autoCycleTimer
       });
@@ -456,48 +393,27 @@ class InfiniteCarousel extends Component {
   };
 
   onMouseEnter = (e) => {
-    if (this.props.autoCycle && this.props.pauseOnHover) {
+    if (this.state.settings.autoCycle && this.state.settings.pauseOnHover) {
       this.pauseAutoCycle();
     }
   };
 
   onMouseOver = (e) => {
-    if (this.props.autoCycle && this.props.pauseOnHover) {
+    if (this.state.settings.autoCycle && this.state.settings.pauseOnHover) {
       this.pauseAutoCycle();
     }
   };
 
   onMouseLeave = (e) => {
-    if (this.props.autoCycle && this.props.pauseOnHover) {
+    if (this.state.settings.autoCycle && this.state.settings.pauseOnHover) {
       this.playAutoCycle();
     }
   };
 
-  getSwipeDirection = (x1, x2, y1, y2) => {
-    const xDist = x1 - x2;
-    const yDist = y1 - y2;
-
-    let swipeAngle = Math.round(Math.atan2(yDist, xDist) * 180 / Math.PI);
-
-    if (swipeAngle < 0) {
-      swipeAngle = 360 - Math.abs(swipeAngle);
-    }
-    if ((swipeAngle <= 45) && (swipeAngle >= 0)) {
-      return 1;
-    }
-    if ((swipeAngle <= 360) && (swipeAngle >= 315)) {
-      return 1;
-    }
-    if ((swipeAngle >= 135) && (swipeAngle <= 225)) {
-      return -1;
-    }
-    return 0;
-  };
-
   onSwipeStart = (e) => {
-    if ((this.props.swipe === false) || ('ontouchend' in document && this.props.swipe === false)) {
+    if ((this.state.settings.swipe === false) || ('ontouchend' in document && this.state.settings.swipe === false)) {
       return;
-    } else if (this.props.draggable === false && e.type.indexOf('mouse') !== -1) {
+    } else if (this.state.settings.draggable === false && e.type.indexOf('mouse') !== -1) {
       return;
     }
 
@@ -506,7 +422,6 @@ class InfiniteCarousel extends Component {
     
     this.setState({
       dragging: true,
-      //animating: true,
       touchObject: {
         startX,
         startY
@@ -525,7 +440,7 @@ class InfiniteCarousel extends Component {
     const curX = (e.touches !== undefined) ? e.touches[0].pageX : e.clientX;
     const curY = (e.touches !== undefined) ? e.touches[0].pageY : e.clientY;
     const touchObject = this.state.touchObject;
-    const direction = this.getSwipeDirection(touchObject.startX, curX, touchObject.startY, curY);
+    const direction = getSwipeDirection(touchObject.startX, curX, touchObject.startY, curY);
 
     if (direction !== 0) {
       e.preventDefault();
@@ -566,6 +481,69 @@ class InfiniteCarousel extends Component {
     }
   };
 
+  getTrackStyles = () => {
+    const settings = this.state.settings;
+    const touchObject = this.state.touchObject;
+
+    const trackWidth = (this.state.slidesWidth + (settings.slidesSpacing * 2)) * (this.state.slidesCount + settings.slidesToShow * 2);
+    const totalSlideWidth = this.state.slidesWidth + (settings.slidesSpacing * 2);
+    const initialTrackPostion = totalSlideWidth * this.props.slidesToShow;
+    const transition = this.state.animating ? `transform ${settings.animationDuration}ms ease` : '';
+    const touchOffset = settings.swipe && touchObject.length ? touchObject.length * touchObject.direction : 0;
+    const trackPosition = initialTrackPostion + (totalSlideWidth * this.state.currentIndex) + touchOffset;
+
+    return {
+      position: 'relative',
+      display: 'block',
+      width: trackWidth,
+      height: 'auto',
+      padding: 0,
+      transition: transition,
+      transform: `translate(${-trackPosition}px, 0px)`,
+      boxSizing: 'border-box',
+      MozBoxSizing: 'border-box'
+    };
+  };
+
+  getSlideStyles = () => {
+    const slidesWidth = this.state.slidesWidth;
+
+    return {
+      position: 'relative',
+      float: 'left',
+      display: 'block',
+      width: slidesWidth,
+      height: 'auto',
+      margin: `0 ${this.state.settings.slidesSpacing}px`
+    };
+  };
+
+  getFormatedChildren = (children, lazyLoadedList) => {
+    return React.Children.map(children, (child, index)  => {
+      if (!this.state.settings.lazyLoad || lazyLoadedList.indexOf(index) >= 0) {
+        return (
+          <li
+              className={'infinite-carousel-slide'}
+              key={index}
+              style={this.getSlideStyles()}
+          >
+          {child}
+          </li>
+        );
+      } else {
+        return (
+          <li
+              className={'infinite-carousel-slide'}
+              key={index}
+              style={this.getSlideStyles()}
+          >
+          <img src={this.state.settings.placeholderImageSrc} />
+          </li>
+        );
+      }
+    });
+  };
+
   render() {
     let prevArrow, nextArrow, dots;
 
@@ -598,18 +576,18 @@ class InfiniteCarousel extends Component {
 
     return (
       <div 
-          className='Carousel'
+          className='infinite-carousel'
           onMouseEnter={this.onMouseEnter}
           onMouseLeave={this.onMouseLeave}
           onMouseOver={this.onMouseOver}
       >
       {prevArrow}
       <div 
-          className={'CarouselFrame'}
+          className={'infinite-carousel-frame'}
           ref='frame'
       >
         <ul 
-            className={'CarouselTrack'}
+            className={'infinite-carousel-track'}
             ref='track'
             style={this.getTrackStyles()}
             onMouseDown={this.onSwipeStart}

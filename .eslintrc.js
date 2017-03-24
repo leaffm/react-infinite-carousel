@@ -17,6 +17,7 @@ module.exports = {
   "plugins": [
     "react"
   ],
+  "extends": "airbnb",
   "rules": {
     "semi": ["warn", "always"],
     "eqeqeq": "warn",

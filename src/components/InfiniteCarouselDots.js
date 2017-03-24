@@ -5,60 +5,24 @@ import React, {
 
 class InfiniteCarouselDots extends Component {
 
-  getDotsStyle = () => {
-    return {
-      position: 'absolute',
-      left: '50%',
-      bottom: '0',
-      padding: '0',
-      transform: 'translateX(-50%)'
-    };
-  };
-
-  getDotStyle = () => {
-    return {
-      display: 'inline-block',
-      listStyle: 'none',
-      margin: '0 5px',
-      cursor: 'pointer'
-    };
-  };
-
-  getIconStyle = (active) => {
-    const color = active ? '#48799a' : '#E5E5E5';
-    return {
-      display: 'block',
-      backgroundColor: color,
-      width: 10,
-      height: 10,
-      borderRadius: '50%'
-    };
-  };
-
   render() {
     let dots = [];
     for (let i=0; i < this.props.numberOfDots; i++) {
+      const className = `infinite-carousel-dot ${i === this.props.activePage ? 'active' : ''}`;
       dots.push(
         <li 
-            className={i === this.props.activePage ? 'active' : ''}
+            className={className}
             data-index={i}
             key={i + 1}
             onClick={this.props.onClick}
-            style={this.getDotStyle()}
         >
-          <i 
-            className='dot'
-            style={this.getIconStyle(i === this.props.activePage)}
-          />
+          <i className='icon'/>
         </li>
         );
     }
 
     return (
-      <ul 
-          className='dots'
-          style={this.getDotsStyle()}
-      >
+      <ul className='infinite-carousel-dots'>
         {dots}
       </ul>
     );

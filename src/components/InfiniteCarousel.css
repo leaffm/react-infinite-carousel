@@ -1,12 +1,72 @@
-.Carousel {
+.infinite-carousel {
 	position: relative;
 }
 
-.CarouselFrame {
+.infinite-carousel-frame {
 	width: 100%;
 	overflow: hidden;
 }
 
-.CarouselSlide img {
+.infinite-carousel-slide img {
 	width: 100%;
+}
+
+.infinite-carousel-dots {
+	position: absolute;
+  left: 50%;
+  bottom: 0;
+  padding: 0;
+  transform: translateX(-50%);
+}
+
+.infinite-carousel-dot {
+	display: inline-block;
+  list-style: none;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.infinite-carousel-dot .icon {
+	display: block;
+  background-color: #E5E5E5;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.infinite-carousel-dot.active .icon {
+  background-color: #48799A;
+}
+
+.infinite-carousel-arrow {
+	display: block;
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  transform: translateY(-50%);
+}
+
+.infinite-carousel-arrow.prev {
+	left: auto;
+	right: 15px;
+}
+
+.infinite-carousel-arrow.next {
+	left: 15px;
+	right: auto;
+}
+
+.infinite-carousel-arrow .icon {
+	display: inline-block;
+  padding: 10px;
+  border: solid #E5E5E5;
+  border-width: 0 5px 5px 0;
+}
+
+.infinite-carousel-arrow.next .icon {
+	transform: rotate(135deg);
+}
+
+.infinite-carousel-arrow.prev .icon {
+	transform: rotate(-45deg);
 }
