@@ -31,7 +31,9 @@ class InfiniteCarousel extends Component {
     pauseOnHover: PropTypes.bool,
     responsive: PropTypes.bool,
     breakpoints: PropTypes.arrayOf(PropTypes.object),
-    placeholderImageSrc: PropTypes.string
+    placeholderImageSrc: PropTypes.string,
+    nextArrow: PropTypes.element,
+    prevArrow: PropTypes.element
   };
 
   static defaultProps = {
@@ -51,7 +53,9 @@ class InfiniteCarousel extends Component {
     pauseOnHover: true,
     responsive: true,
     breakpoints: [],
-    placeholderImageSrc: 'data:image/gif;base64,R0lGODlhAQABAIABAEdJRgAAACwAAAAAAQABAAACAkQBAA=='
+    placeholderImageSrc: 'data:image/gif;base64,R0lGODlhAQABAIABAEdJRgAAACwAAAAAAQABAAACAkQBAA==',
+    nextArrow: null,
+    prevArrow: null
   };
 
   constructor(props) {
@@ -548,18 +552,32 @@ class InfiniteCarousel extends Component {
     let prevArrow, nextArrow, dots;
 
     if (this.state.settings.arrows) {
-      prevArrow = (
-        <InfiniteCarouselArrow 
-            next={false}
-            onClick={this.moveToPrevious}
-        />
+      if (this.state.settings.prevArrow == null) {
+        prevArrow = (
+          <InfiniteCarouselArrow 
+              next={false}
+              onClick={this.moveToPrevious}
+          />
         );
-
-      nextArrow = (
-        <InfiniteCarouselArrow 
-            onClick={this.moveToNext}
-        />
+      } else {
+        const prevArrowProps = {
+          onClick: this.moveToPrevious
+        }
+        prevArrow = React.cloneElement(this.state.settings.prevArrow, prevArrowProps);
+      }
+      
+      if (this.state.settings.nextArrow == null) {
+        nextArrow = (
+          <InfiniteCarouselArrow 
+              onClick={this.moveToNext}
+          />
         );
+      } else {
+        const nextArrowProps = {
+          onClick: this.moveToNext
+        }
+        nextArrow = React.cloneElement(this.state.settings.nextArrow, nextArrowProps);
+      }
     }
 
     if (this.state.settings.dots) {
