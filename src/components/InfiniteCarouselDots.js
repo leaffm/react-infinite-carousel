@@ -6,23 +6,27 @@ import React, {
 class InfiniteCarouselDots extends Component {
 
   render() {
-    let dots = [];
-    for (let i=0; i < this.props.numberOfDots; i++) {
-      const className = `infinite-carousel-dot ${i === this.props.activePage ? 'active' : ''}`;
+    const dots = [];
+    const className = this.props.styles.InfiniteCarouselDots;
+    const dotClassName = this.props.styles.InfiniteCarouselDot;
+    const dotIconClassName = this.props.styles.InfiniteCarouselDotIcon;
+    const activeClass = this.props.styles.InfiniteCarouselDotActiveIcon;
+
+    for (let i = 0; i < this.props.numberOfDots; i += 1) {
       dots.push(
-        <li 
-            className={className}
-            data-index={i}
-            key={i + 1}
-            onClick={this.props.onClick}
+        <li
+          className={dotClassName}
+          data-index={i}
+          key={i + 1}
+          onClick={this.props.onClick}
         >
-          <i className='icon'/>
-        </li>
-        );
+          <i className={`${dotIconClassName} ${i === this.props.activePage ? activeClass : ''}`} />
+        </li>,
+      );
     }
 
     return (
-      <ul className='infinite-carousel-dots'>
+      <ul className={className}>
         {dots}
       </ul>
     );
@@ -30,9 +34,10 @@ class InfiniteCarouselDots extends Component {
 }
 
 InfiniteCarouselDots.propTypes = {
-  numberOfDots: PropTypes.number,
-  activePage: PropTypes.number,
-  onClick: PropTypes.func
+  numberOfDots: PropTypes.number.isRequired,
+  activePage: PropTypes.number.isRequired,
+  onClick: PropTypes.func.isRequired,
+  styles: PropTypes.shape.isRequired,
 };
 
 export default InfiniteCarouselDots;

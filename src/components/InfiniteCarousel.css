@@ -1,17 +1,17 @@
-.infinite-carousel {
+.InfiniteCarousel {
 	position: relative;
 }
 
-.infinite-carousel-frame {
+.InfiniteCarouselFrame {
 	width: 100%;
 	overflow: hidden;
 }
 
-.infinite-carousel-slide img {
+.InfiniteCarouselSlide img {
 	width: 100%;
 }
 
-.infinite-carousel-dots {
+.InfiniteCarouselDots {
 	position: absolute;
   left: 50%;
   bottom: 0;
@@ -19,14 +19,14 @@
   transform: translateX(-50%);
 }
 
-.infinite-carousel-dot {
+.InfiniteCarouselDot {
 	display: inline-block;
   list-style: none;
   margin: 0 5px;
   cursor: pointer;
 }
 
-.infinite-carousel-dot .icon {
+.InfiniteCarouselDotIcon {
 	display: block;
   background-color: #E5E5E5;
   width: 10px;
@@ -34,39 +34,43 @@
   border-radius: 50%;
 }
 
-.infinite-carousel-dot.active .icon {
+.InfiniteCarouselDotActiveIcon {
   background-color: #48799A;
 }
 
-.infinite-carousel-arrow {
+.InfiniteCarouselArrow {
 	display: block;
+  background: none;
+  border: none;
   position: absolute;
   top: 50%;
   z-index: 2;
+  outline: none;
   transform: translateY(-50%);
+  cursor: pointer;
 }
 
-.infinite-carousel-arrow.prev {
-	left: auto;
-	right: 15px;
-}
-
-.infinite-carousel-arrow.next {
+.InfiniteCarouselArrowPrev {
 	left: 15px;
-	right: auto;
+  right: auto;
 }
 
-.infinite-carousel-arrow .icon {
+.InfiniteCarouselArrowNext {
+  left: auto;
+  right: 15px;
+}
+
+.InfiniteCarouselArrowIcon {
 	display: inline-block;
   padding: 10px;
   border: solid #E5E5E5;
   border-width: 0 5px 5px 0;
 }
 
-.infinite-carousel-arrow.next .icon {
-	transform: rotate(135deg);
+.InfiniteCarouselArrowNextIcon {
+	transform: rotate(-45deg);
 }
 
-.infinite-carousel-arrow.prev .icon {
-	transform: rotate(-45deg);
+.InfiniteCarouselArrowPrevIcon {
+  transform: rotate(135deg);
 }

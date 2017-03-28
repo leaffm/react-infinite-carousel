@@ -2,8 +2,11 @@
 
 # dependencies
 node_modules
+build
+dist
 
 # misc
 .DS_Store
 .env
 npm-debug.log
+*.tgz

@@ -10,7 +10,7 @@ export function getSwipeDirection(x1, x2, y1, y2) {
   const xDist = x1 - x2;
   const yDist = y1 - y2;
 
-  let swipeAngle = Math.round(Math.atan2(yDist, xDist) * 180 / Math.PI);
+  let swipeAngle = Math.round((Math.atan2(yDist, xDist) * 180) / Math.PI);
 
   if (swipeAngle < 0) {
     swipeAngle = 360 - Math.abs(swipeAngle);

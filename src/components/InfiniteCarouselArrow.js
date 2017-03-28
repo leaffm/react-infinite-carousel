@@ -5,26 +5,40 @@ import React, {
 
 class InfiniteCarouselArrow extends Component {
   render() {
-    const className = `infinite-carousel-arrow ${ this.props.next ? 'prev' : 'next' }`;
+    const arrowClassName = this.props.styles.InfiniteCarouselArrow;
+    let typeClassName;
+    if (this.props.next) {
+      typeClassName = this.props.styles.InfiniteCarouselArrowNext;
+    } else {
+      typeClassName = this.props.styles.InfiniteCarouselArrowPrev;
+    }
+
+    const iconClassName = this.props.styles.InfiniteCarouselArrowIcon;
+    let iconTypeClassName;
+    if (this.props.next) {
+      iconTypeClassName = this.props.styles.InfiniteCarouselArrowNextIcon;
+    } else {
+      iconTypeClassName = this.props.styles.InfiniteCarouselArrowPrevIcon;
+    }
     return (
-      <div          
-          className={className}
-          onClick={this.props.onClick}
+      <button
+        className={`${arrowClassName} ${typeClassName}`}
+        onClick={this.props.onClick}
       >
-        <a href='#'><i className='icon'/></a>
-      </div>
+        <i className={`${iconClassName} ${iconTypeClassName}`} />
+      </button>
     );
   }
 }
 
 InfiniteCarouselArrow.propTypes = {
-  className: PropTypes.string,
   next: PropTypes.bool,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
+  styles: PropTypes.object.isRequired,
 };
 
 InfiniteCarouselArrow.defaultProps = {
-  next: true
+  next: true,
 };
 
 export default InfiniteCarouselArrow;
