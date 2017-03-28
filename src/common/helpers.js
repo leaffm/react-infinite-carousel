@@ -26,3 +26,7 @@ export function getSwipeDirection(x1, x2, y1, y2) {
   }
   return 0;
 }
+
+export function isTouchDevice() {
+  return 'ontouchstart' in document.documentElement;
+}

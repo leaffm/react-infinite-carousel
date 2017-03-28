@@ -4,7 +4,7 @@ import React, {
   Children,
 } from 'react';
 import { media } from 'react-responsive-mixin';
-import { getElementWidth, getSwipeDirection } from './common/helpers';
+import { getElementWidth, getSwipeDirection, isTouchDevice } from './common/helpers';
 import InfiniteCarouselArrow from './components/InfiniteCarouselArrow';
 import InfiniteCarouselDots from './components/InfiniteCarouselDots';
 
@@ -33,6 +33,7 @@ class InfiniteCarousel extends Component {
     placeholderImageSrc: PropTypes.string,
     nextArrow: PropTypes.element,
     prevArrow: PropTypes.element,
+    scrollOnDevice: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -54,6 +55,7 @@ class InfiniteCarousel extends Component {
     placeholderImageSrc: 'data:image/gif;base64,R0lGODlhAQABAIABAEdJRgAAACwAAAAAAQABAAACAkQBAA==',
     nextArrow: null,
     prevArrow: null,
+    scrollOnDevice: false,
   };
 
   constructor(props) {
@@ -82,6 +84,13 @@ class InfiniteCarousel extends Component {
         endY: 0,
         length: 0,
         direction: -1,
+      },
+      isTouchDevice: false,
+      scrollOnDeviceProps: {
+        arrows: false,
+        dots: false,
+        lazyLoad: false,
+        autoCycle: false,
       },
     };
   }
@@ -133,8 +142,15 @@ class InfiniteCarousel extends Component {
           query = { minWidth: breakpoints[index - 1], maxWidth: element };
         }
         media(query, () => {
+          const scrollOnDeviceProps = isTouchDevice() ? this.state.scrollOnDeviceProps : {};
           this.setState({
-            settings: Object.assign({}, this.defaultProps, this.props, settings[element]),
+            settings: Object.assign(
+              {},
+              this.defaultProps,
+              this.props,
+              settings[element],
+              scrollOnDeviceProps
+            ),
           });
         });
       });
@@ -143,8 +159,9 @@ class InfiniteCarousel extends Component {
       breakpoints.reverse();
       const query = { minWidth: (breakpoints[0] + 1) };
       media(query, () => {
+        const scrollOnDeviceProps = isTouchDevice() ? this.state.scrollOnDeviceProps : {};
         this.setState({
-          settings: Object.assign({}, this.defaultProps, this.props),
+          settings: Object.assign({}, this.defaultProps, this.props, scrollOnDeviceProps),
         });
       });
     }
@@ -152,8 +169,10 @@ class InfiniteCarousel extends Component {
 
   setDimensions = () => {
     const settings = this.state.settings;
+    const scrollOnDevice = this.props.scrollOnDevice && this.state.isTouchDevice;
+    
     const childrenCount = Children.count(this.props.children);
-    const slidesCount = Children.count(this.state.children);
+    const slidesCount =  scrollOnDevice ? childrenCount : Children.count(this.state.children);
     const frameWidth = getElementWidth(this.refs.frame);
     const slidesWidth = (frameWidth / settings.slidesToShow) - (settings.slidesSpacing * 2);
     const childrenLength = this.props.children.length;
@@ -507,13 +526,26 @@ class InfiniteCarousel extends Component {
     };
   };
 
+  getScrollTrackStyles = () => {
+    return {
+      clear: 'both',
+      position: 'relative',
+      display: 'block',
+      width: '100%',
+      height: 'auto',
+      padding: 0,
+      boxSizing: 'border-box',
+      MozBoxSizing: 'border-box',
+    };
+  };
+
   getSlideStyles = () => {
     const slidesWidth = this.state.slidesWidth;
 
     return {
       position: 'relative',
-      float: 'left',
-      display: 'block',
+      //float: 'left',
+      display: 'inline-block',
       width: slidesWidth,
       height: 'auto',
       margin: `0 ${this.state.settings.slidesSpacing}px`,
@@ -547,11 +579,22 @@ class InfiniteCarousel extends Component {
   };
 
   init = () => {
-    const settings = Object.assign({}, this.defaultProps, this.props);
-    const children = this.getChildrenList(this.props.children, this.props.slidesToShow);
+    const isTouchDevicex = isTouchDevice();
+    let children;
+    let settings;
+
+    if (isTouchDevicex) {
+      settings = Object.assign({}, this.defaultProps, this.props, this.state.scrollOnDeviceProps);
+      children = !Array.isArray(this.props.children) ? [this.props.children] : this.props.children;
+    } else {
+      settings = Object.assign({}, this.defaultProps, this.props);
+      children = this.getChildrenList(this.props.children, this.props.slidesToShow);
+    }
+    
     this.setState({
       children,
       settings,
+      isTouchDevicex,
     });
 
     if (this.props.responsive) {
@@ -607,6 +650,18 @@ class InfiniteCarousel extends Component {
     }
 
     const children = this.getFormatedChildren(this.state.children, this.state.lazyLoadedList);
+    let trackStyles, trackClassName, frameClassName;
+
+    if (this.props.scrollOnDevice && isTouchDevice()) {
+      trackStyles = this.getScrollTrackStyles();
+      trackClassName = styles.InfiniteCarouselScrollTrack;
+    } else {
+      trackStyles = this.getTrackStyles();
+      trackClassName = '';
+    }
+
+    const disableSwipeEvents = this.props.scrollOnDevice && isTouchDevice();
+    
 
     return (
       <div
@@ -621,17 +676,10 @@ class InfiniteCarousel extends Component {
           ref='frame'
         >
           <ul
-            className={'infinite-carousel-track'}
+            className={trackClassName}
             ref='track'
-            style={this.getTrackStyles()}
-            onMouseDown={this.onSwipeStart}
-            onMouseLeave={this.state.dragging ? this.onSwipeEnd : null}
-            onMouseMove={this.state.dragging ? this.onSwipeMove : null}
-            onMouseUp={this.onSwipeEnd}
-            onTouchCancel={this.state.dragging ? this.onSwipeEnd : null}
-            onTouchEnd={this.onSwipeEnd}
-            onTouchMove={this.state.dragging ? this.onSwipeMove : null}
-            onTouchStart={this.onSwipeStart}
+            style={trackStyles}
+            
           >
             {children}
           </ul>
