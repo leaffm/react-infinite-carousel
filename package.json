@@ -1,5 +1,5 @@
 {
-  "name": "react-infinite-carousel",
+  "name": "@leaffm/react-infinite-carousel",
   "version": "1.0.0",
   "description": "React simple infinite carousel with lazy loading and responsive support",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/leaffm/react-infinite-carousel.git"
+    "url": "git+https://github.com/leaffm/react-infinite-carousel.git"
   },
   "keywords": [
     "carousel",
