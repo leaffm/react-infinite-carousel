@@ -379,8 +379,7 @@ class InfiniteCarousel extends Component {
   };
 
   onWindowResized = () => {
-    clearTimeout(this.resizeTimer);
-    this.resizeTimer = setTimeout(this.setDimensions, 100);
+    this.setDimensions();
   };
 
   autoCycle = () => {
@@ -556,7 +555,6 @@ class InfiniteCarousel extends Component {
   getFormatedChildren = (children, lazyLoadedList) => {
     return React.Children.map(children, (child, index) => {
       const settings = this.state.settings;
-      console.log(this.state.slidePages);
       if (!settings.lazyLoad || lazyLoadedList.indexOf(index) >= 0 || this.state.slidePages === 1) {
         return (
           <li
