@@ -4,7 +4,7 @@ React simple infinite carousel with lazy loading and responsive support.
 ### Installation
 
 ```bash
-npm install react-infinite-carousel
+npm install @leaffm/react-infinite-carousel
 ```
 
 ### Example
@@ -13,7 +13,7 @@ npm install react-infinite-carousel
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import InfiniteCarousel from 'react-infinite-carousel';
+import InfiniteCarousel from '@leaffm/react-infinite-carousel';
 
 ReactDOM.render(
   <InfiniteCarousel
@@ -61,4 +61,7 @@ document.getElementById('root'));
 | pauseOnHover       | bool | Pauses autocycle | true |
 | responsive      	 | bool | Enables breakpoints | true |
 | breakpoints        | array | Array of objects in the form of ```{ breakpoint: int, settings: { ... } }```  | [] |
-| placeholderImageSrc| string | Go to slide on click | base64 gif image 1x1 |
+| placeholderImageSrc| string | placeholder image source | base64 gif image 1x1 |
+| nextArrow          | React element | Optional custom arrow | null |
+| prevArrow          | React element | Optional custom arrow | null |
+| scrollOnDevice     | bool | Adds scroll functionality on touch devices instead of normal swipe, this disables lazy-loading, infinite navigation, arrows and dots | false |
