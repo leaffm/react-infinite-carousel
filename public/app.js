@@ -25,6 +25,7 @@ ReactDOM.render(
     dots={true}
     slidesToScroll={4}
     slidesToShow={4}
+    scrollOnDevice={true}
   >
     <div>
       <img

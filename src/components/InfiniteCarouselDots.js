@@ -37,7 +37,7 @@ InfiniteCarouselDots.propTypes = {
   numberOfDots: PropTypes.number.isRequired,
   activePage: PropTypes.number.isRequired,
   onClick: PropTypes.func.isRequired,
-  styles: PropTypes.shape.isRequired,
+  styles: PropTypes.object.isRequired,
 };
 
 export default InfiniteCarouselDots;

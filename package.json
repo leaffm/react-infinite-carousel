@@ -1,14 +1,14 @@
 {
-  "name": "react-infinite-carousel",
-  "version": "1.0.0",
+  "name": "@leaffm/react-infinite-carousel",
+  "version": "1.0.1",
   "description": "React simple infinite carousel with lazy loading and responsive support",
   "scripts": {
     "build": "WEBPACK_ENV=build webpack",
-    "dev": "WEBPACK_ENV=dev webpack --progress --colors --watch"
+    "dev": "WEBPACK_ENV=dev webpack-dev-server --content-base dist/ --progress --colors --watch"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/leaffm/react-infinite-carousel.git"
+    "url": "git+https://github.com/leaffm/react-infinite-carousel.git"
   },
   "keywords": [
     "carousel",
@@ -24,6 +24,7 @@
   ],
   "author": "Leaf Music",
   "license": "MIT",
+  "main": "./lib/react-infinite-carusel.min.js",
   "bugs": {
     "url": "https://github.com/leaffm/react-infinite-carousel/issues"
   },
@@ -59,5 +60,17 @@
     "react-dom": "^15.4.2",
     "react-responsive-mixin": "^0.4.0"
   },
-  "main": "lib/react-infinite-carousel.min.js"
+  "peerDependencies": {
+    "react": "^0.14.0 || ^15.3.2",
+    "react-dom": "^0.14.0 || ^15.3.2"
+  },
+  "npmName": "@leaffm/react-infinite-carousel",
+  "npmFileMap": [
+    {
+      "basePath": "/lib/",
+      "files": [
+        "*.js"
+      ]
+    }
+  ]
 }
