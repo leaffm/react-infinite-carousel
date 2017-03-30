@@ -52,7 +52,7 @@ class InfiniteCarousel extends Component {
     pauseOnHover: true,
     responsive: true,
     breakpoints: [],
-    placeholderImageSrc: 'data:image/gif;base64,R0lGODlhAQABAIABAEdJRgAAACwAAAAAAQABAAACAkQBAA==',
+    placeholderImageSrc: '',
     nextArrow: null,
     prevArrow: null,
     scrollOnDevice: false,
@@ -557,7 +557,7 @@ class InfiniteCarousel extends Component {
     const slidesWidth = this.state.slidesWidth;
     const isScrollTouch = this.props.scrollOnDevice && isTouchDevice();
     const float = isScrollTouch ? 'none' : 'left';
-    const display = isScrollTouch ? 'inline-block' : 'block';
+    const display = 'inline-block';
     return {
       position: 'relative',
       float: float,
