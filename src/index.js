@@ -71,6 +71,7 @@ class InfiniteCarousel extends Component {
       slidesCount: 0,
       slidesWidth: 1,
       slidePages: 1,
+      singlePage: true,
       frameWidth: 1,
       settings: {},
       breakpoints: {},
@@ -142,15 +143,18 @@ class InfiniteCarousel extends Component {
         }
         media(query, () => {
           const scrollOnDeviceProps = isTouchDevice() ? this.state.scrollOnDeviceProps : {};
+          const newSettings = Object.assign(
+            {},
+            this.defaultProps,
+            this.props,
+            settings[element],
+            scrollOnDeviceProps
+          );
+          const children = this.getChildrenList(this.props.children, newSettings.slidesToShow);
           this.setState({
-            settings: Object.assign(
-              {},
-              this.defaultProps,
-              this.props,
-              settings[element],
-              scrollOnDeviceProps
-            ),
-          });
+            settings: newSettings,
+            children,
+          }, this.setDimensions);
         });
       });
 
@@ -159,9 +163,12 @@ class InfiniteCarousel extends Component {
       const query = { minWidth: (breakpoints[0] + 1) };
       media(query, () => {
         const scrollOnDeviceProps = isTouchDevice() ? this.state.scrollOnDeviceProps : {};
+        const newSettings = Object.assign({}, this.defaultProps, this.props, scrollOnDeviceProps);
+        const children = this.getChildrenList(this.props.children, newSettings.slidesToShow);
         this.setState({
-          settings: Object.assign({}, this.defaultProps, this.props, scrollOnDeviceProps),
-        });
+          settings: newSettings,
+          children,
+        }, this.setDimensions);
       });
     }
   };
@@ -175,10 +182,18 @@ class InfiniteCarousel extends Component {
     const frameWidth = getElementWidth(this.refs.frame);
     const slidesWidth = (frameWidth / settings.slidesToShow) - (settings.slidesSpacing * 2);
     const childrenLength = this.props.children.length;
-    const lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, this.state.currentIndex);
     const activePage = Math.ceil(this.state.currentIndex / settings.slidesToShow);
     const countPages = Math.ceil(childrenLength / settings.slidesToShow);
     const slidePages = childrenLength > settings.slidesToShow ? countPages : 1;
+    const singlePage = slidePages > 1 ? false : true;
+
+    let lazyLoadedList;
+    if (singlePage) {
+      lazyLoadedList = this.state.children.map((child, index) => { return index; });
+    } else {
+      lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, this.state.currentIndex);
+    }
+
 
     this.setState({
       activePage,
@@ -187,6 +202,7 @@ class InfiniteCarousel extends Component {
       slidesWidth,
       frameWidth,
       slidePages,
+      singlePage,
       lazyLoadedList,
     });
   };
@@ -197,8 +213,8 @@ class InfiniteCarousel extends Component {
     let limit;
     const settings = this.state.settings;
 
-    start = children.length + this.props.slidesToShow;
-    if (currentIndex === 0 && this.state.lazyLoadedList.indexOf(0) < 0) {
+    start = children.length + settings.slidesToShow;
+    if (currentIndex === 0 && this.state.lazyLoadedList.indexOf(start) < 0) {
       limit = (start + settings.slidesToShow) - 1;
       for (let index = start; index <= limit; index += 1) {
         lazyLoadedList.push(index);
@@ -207,16 +223,16 @@ class InfiniteCarousel extends Component {
 
     start = 0;
     const isAtLastPage = currentIndex === children.length - settings.slidesToShow;
-    const notLazyLoaded = lazyLoadedList.indexOf((children.length + settings.slidesToShow) - 1) < 0;
+    const notLazyLoaded = lazyLoadedList.indexOf(start) < 0;
 
     if (isAtLastPage && notLazyLoaded) {
-      limit = (start + this.props.slidesToShow) - 1;
+      limit = (start + settings.slidesToShow) - 1;
       for (let index = start; index <= limit; index += 1) {
         lazyLoadedList.push(index);
       }
     }
 
-    start = currentIndex + this.props.slidesToShow;
+    start = currentIndex + settings.slidesToShow;
     limit = start + (settings.slidesToShow - 1);
 
     for (let index = start; index <= limit; index += 1) {
@@ -504,7 +520,7 @@ class InfiniteCarousel extends Component {
     let trackWidth = (this.state.slidesWidth + (settings.slidesSpacing * 2));
     trackWidth *= (this.state.slidesCount + (settings.slidesToShow * 2));
     const totalSlideWidth = this.state.slidesWidth + (settings.slidesSpacing * 2);
-    const initialTrackPostion = totalSlideWidth * this.props.slidesToShow;
+    const initialTrackPostion = totalSlideWidth * settings.slidesToShow;
     const transition = this.state.animating ? `transform ${settings.animationDuration}ms ease` : '';
     const hasTouchOffset = settings.swipe && touchObject.length;
     const touchOffset = hasTouchOffset ? touchObject.length * touchObject.direction : 0;
@@ -514,11 +530,11 @@ class InfiniteCarousel extends Component {
     return {
       position: 'relative',
       display: 'block',
-      width: this.state.slidePages > 1 ? trackWidth : '100%',
+      width: !this.state.singlePage ? trackWidth : '100%',
       height: 'auto',
       padding: 0,
       transition,
-      transform: this.state.slidePages > 1 ? `translate(${-trackPosition}px, 0px)` : 'none',
+      transform: !this.state.singlePage ? `translate(${-trackPosition}px, 0px)` : 'none',
       boxSizing: 'border-box',
       MozBoxSizing: 'border-box',
     };
@@ -555,7 +571,7 @@ class InfiniteCarousel extends Component {
   getFormatedChildren = (children, lazyLoadedList) => {
     return React.Children.map(children, (child, index) => {
       const settings = this.state.settings;
-      if (!settings.lazyLoad || lazyLoadedList.indexOf(index) >= 0 || this.state.slidePages === 1) {
+      if (!settings.lazyLoad || lazyLoadedList.indexOf(index) >= 0) {
         return (
           <li
             className={styles.InfiniteCarouselSlide}
@@ -607,7 +623,7 @@ class InfiniteCarousel extends Component {
     let nextArrow;
     let dots;
 
-    if (this.state.settings.arrows && this.state.slidePages !== 1) {
+    if (this.state.settings.arrows && !this.state.singlePage) {
       if (this.state.settings.prevArrow == null) {
         prevArrow = (
           <InfiniteCarouselArrow
@@ -638,7 +654,7 @@ class InfiniteCarousel extends Component {
       }
     }
 
-    if (this.state.settings.dots && this.state.slidePages !== 1) {
+    if (this.state.settings.dots && !this.state.singlePage) {
       dots = (
         <InfiniteCarouselDots
           activePage={this.state.activePage}
