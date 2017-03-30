@@ -142,7 +142,6 @@ class InfiniteCarousel extends Component {
           query = { minWidth: breakpoints[index - 1], maxWidth: element };
         }
         media(query, () => {
-          const scrollOnDeviceProps = isTouchDevice() ? this.state.scrollOnDeviceProps : {};
           const newSettings = Object.assign(
             {},
             this.defaultProps,
@@ -150,6 +149,8 @@ class InfiniteCarousel extends Component {
             settings[element],
             scrollOnDeviceProps
           );
+          const scrollOnDevice = this.props.scrollOnDevice && isTouchDevice();
+          const scrollOnDeviceProps = scrollOnDevice ? this.state.scrollOnDeviceProps : {};
           const children = this.getChildrenList(this.props.children, newSettings.slidesToShow);
           this.setState({
             settings: newSettings,
@@ -162,8 +163,9 @@ class InfiniteCarousel extends Component {
       breakpoints.reverse();
       const query = { minWidth: (breakpoints[0] + 1) };
       media(query, () => {
-        const scrollOnDeviceProps = isTouchDevice() ? this.state.scrollOnDeviceProps : {};
         const newSettings = Object.assign({}, this.defaultProps, this.props, scrollOnDeviceProps);
+        const scrollOnDevice = this.props.scrollOnDevice && isTouchDevice();
+        const scrollOnDeviceProps = scrollOnDevice ? this.state.scrollOnDeviceProps : {};
         const children = this.getChildrenList(this.props.children, newSettings.slidesToShow);
         this.setState({
           settings: newSettings,
@@ -188,7 +190,7 @@ class InfiniteCarousel extends Component {
     const singlePage = slidePages > 1 ? false : true;
 
     let lazyLoadedList;
-    if (singlePage) {
+    if (singlePage || scrollOnDevice) {
       lazyLoadedList = this.state.children.map((child, index) => { return index; });
     } else {
       lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, this.state.currentIndex);
@@ -247,6 +249,10 @@ class InfiniteCarousel extends Component {
   getChildrenList = (children, slidesToShow) => {
     if (!Array.isArray(children)) {
       return [children];
+    }
+
+    if (this.props.scrollOnDevice && isTouchDevice()) {   
+      return children;
     }
 
     if (children.length > slidesToShow) {
@@ -596,18 +602,14 @@ class InfiniteCarousel extends Component {
   };
 
   init = () => {
-    const isTouchDevicex = isTouchDevice();
-    let children;
+    const children = this.getChildrenList(this.props.children, this.props.slidesToShow);
     let settings;
-
-    if (this.props.scrollOnDevice && isTouchDevicex) {
+    if (this.props.scrollOnDevice && isTouchDevice()) {
       settings = Object.assign({}, this.defaultProps, this.props, this.state.scrollOnDeviceProps);
-      children = !Array.isArray(this.props.children) ? [this.props.children] : this.props.children;
     } else {
       settings = Object.assign({}, this.defaultProps, this.props);
-      children = this.getChildrenList(this.props.children, this.props.slidesToShow);
     }
-    
+
     this.setState({
       children,
       settings,
@@ -619,12 +621,14 @@ class InfiniteCarousel extends Component {
   };
 
   render() {
+    const scrollOnDevice = this.props.scrollOnDevice && isTouchDevice();
+    const settings = this.state.settings;
     let prevArrow;
     let nextArrow;
     let dots;
 
-    if (this.state.settings.arrows && !this.state.singlePage) {
-      if (this.state.settings.prevArrow == null) {
+    if (settings.arrows && !this.state.singlePage && !scrollOnDevice) {
+      if (settings.prevArrow == null) {
         prevArrow = (
           <InfiniteCarouselArrow
             next={false}
@@ -636,10 +640,10 @@ class InfiniteCarousel extends Component {
         const prevArrowProps = {
           onClick: this.moveToPrevious,
         };
-        prevArrow = React.cloneElement(this.state.settings.prevArrow, prevArrowProps);
+        prevArrow = React.cloneElement(settings.prevArrow, prevArrowProps);
       }
 
-      if (this.state.settings.nextArrow == null) {
+      if (settings.nextArrow == null) {
         nextArrow = (
           <InfiniteCarouselArrow
             onClick={this.moveToNext}
@@ -650,11 +654,11 @@ class InfiniteCarousel extends Component {
         const nextArrowProps = {
           onClick: this.moveToNext,
         };
-        nextArrow = React.cloneElement(this.state.settings.nextArrow, nextArrowProps);
+        nextArrow = React.cloneElement(settings.nextArrow, nextArrowProps);
       }
     }
 
-    if (this.state.settings.dots && !this.state.singlePage) {
+    if (settings.dots && !this.state.singlePage && !scrollOnDevice) {
       dots = (
         <InfiniteCarouselDots
           activePage={this.state.activePage}
