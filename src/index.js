@@ -516,6 +516,30 @@ class InfiniteCarousel extends Component {
         }
         this.handleTrack(targetIndex, currentIndex);
       }
+    } else {
+      const callback = () => {
+        setTimeout(() => {
+          this.setState({
+            animating: false,
+            dragging: false,
+            touchObject: {
+              startX: 0,
+              startY: 0,
+              endX: 0,
+              endY: 0,
+              length: 0,
+              direction: -1,
+            },
+          });
+        }, this.state.settings.animationDuration);
+      };
+
+      this.setState({
+        animating: true,
+        touchObject: {
+          direction: this.state.touchObject.direction * -1,
+        },
+      }, callback);
     }
   };
 
