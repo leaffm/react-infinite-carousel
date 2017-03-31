@@ -1,6 +1,6 @@
 {
-  "name": "@leaffm/react-infinite-carousel",
-  "version": "1.0.3",
+  "name": "react-leaf-carousel",
+  "version": "1.0.0",
   "description": "React simple infinite carousel with lazy loading and responsive support",
   "scripts": {
     "build": "WEBPACK_ENV=build webpack",
@@ -64,7 +64,7 @@
     "react": "^0.14.0 || ^15.3.2",
     "react-dom": "^0.14.0 || ^15.3.2"
   },
-  "npmName": "@leaffm/react-infinite-carousel",
+  "npmName": "react-leaf-carousel",
   "npmFileMap": [
     {
       "basePath": "/lib/",

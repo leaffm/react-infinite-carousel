@@ -4,7 +4,7 @@ React simple infinite carousel with lazy loading and responsive support.
 ### Installation
 
 ```bash
-npm install @leaffm/react-infinite-carousel
+npm install react-leaf-carousel
 ```
 
 ### Example
@@ -13,7 +13,7 @@ npm install @leaffm/react-infinite-carousel
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import InfiniteCarousel from '@leaffm/react-infinite-carousel';
+import InfiniteCarousel from 'react-leaf-carousel';
 
 ReactDOM.render(
   <InfiniteCarousel
