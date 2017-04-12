@@ -194,13 +194,15 @@ class InfiniteCarousel extends Component {
     const countPages = Math.ceil(childrenLength / settings.slidesToShow);
     const slidePages = childrenLength > settings.slidesToShow ? countPages : 1;
     const singlePage = slidePages > 1 ? false : true;
-    const visibleSlideList = this.getVisibleIndexes(this.props.children, this.state.currentIndex);
 
     let lazyLoadedList;
+    let visibleSlideList;
     if (singlePage || scrollOnDevice) {
       lazyLoadedList = this.state.children.map((child, index) => { return index; });
+      visibleSlideList = this.state.children.map((child, index) => { return index; });
     } else {
       lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, this.state.currentIndex);
+      visibleSlideList = this.getVisibleIndexes(this.props.children, this.state.currentIndex);
     }
 
     this.setState({
