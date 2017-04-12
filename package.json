@@ -13,14 +13,11 @@
   "keywords": [
     "carousel",
     "slider",
-    "infinite",
-    "carousel",
-    "responsive",
-    "carousel",
-    "react",
-    "carousel",
-    "react",
-    "slider"
+    "infinite carousel",
+    "responsive carousel",
+    "react carousel",
+    "react slider",
+    "lazy loading"
   ],
   "author": "Leaf Music",
   "license": "MIT",

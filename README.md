@@ -65,3 +65,5 @@ document.getElementById('root'));
 | nextArrow          | React element | Optional custom arrow | null |
 | prevArrow          | React element | Optional custom arrow | null |
 | scrollOnDevice     | bool | Adds scroll functionality on touch devices instead of normal swipe, this disables lazy-loading, infinite navigation, arrows and dots | false |
+| showSides          | bool | Show outer prev/next slides of the current slide page | false |
+| sidesOpacity       | int | Side slides opacity amount | 1 |
