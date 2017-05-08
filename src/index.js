@@ -36,6 +36,7 @@ class InfiniteCarousel extends Component {
     scrollOnDevice: PropTypes.bool,
     showSides: PropTypes.bool,
     sidesOpacity: PropTypes.number,
+    sideSize: PropTypes.number,
   };
 
   static defaultProps = {
@@ -60,6 +61,7 @@ class InfiniteCarousel extends Component {
     scrollOnDevice: false,
     showSides: false,
     sidesOpacity: 1,
+    sideSize: .5,
   };
 
   constructor(props) {
@@ -187,7 +189,7 @@ class InfiniteCarousel extends Component {
     const childrenCount = Children.count(this.props.children);
     const slidesCount =  scrollOnDevice ? childrenCount : Children.count(this.state.children);
     const frameWidth = getElementWidth(this.refs.frame);
-    const slidesToShow = this.props.showSides ? settings.slidesToShow + 1 : settings.slidesToShow;
+    const slidesToShow = this.props.showSides ? settings.slidesToShow + (settings.sideSize * 2) : settings.slidesToShow;
     const slidesWidth = (frameWidth / slidesToShow) - (settings.slidesSpacing * 2);
     const childrenLength = this.props.children.length;
     const activePage = Math.ceil(this.state.currentIndex / settings.slidesToShow);
@@ -620,7 +622,7 @@ class InfiniteCarousel extends Component {
     let trackPosition = initialTrackPostion + slidePosition + touchOffset;
 
     if (settings.showSides) {
-      const sideWidth = totalSlideWidth / 2;
+      const sideWidth = totalSlideWidth * settings.sideSize;
       trackPosition -= sideWidth;
     }
 
