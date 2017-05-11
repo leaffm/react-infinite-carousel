@@ -30,3 +30,7 @@ export function getSwipeDirection(x1, x2, y1, y2) {
 export function isTouchDevice() {
   return 'ontouchstart' in document.documentElement;
 }
+
+export function sortNumber(a, b) {
+    return a - b;
+}

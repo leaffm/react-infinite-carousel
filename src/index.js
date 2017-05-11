@@ -4,7 +4,12 @@ import React, {
   Children,
 } from 'react';
 import { media } from 'react-responsive-mixin';
-import { getElementWidth, getSwipeDirection, isTouchDevice } from './common/helpers';
+import {
+  getElementWidth,
+  getSwipeDirection,
+  isTouchDevice,
+  sortNumber,
+} from './common/helpers';
 import InfiniteCarouselArrow from './components/InfiniteCarouselArrow';
 import InfiniteCarouselDots from './components/InfiniteCarouselDots';
 
@@ -139,7 +144,7 @@ class InfiniteCarousel extends Component {
     const settings = {};
     breakpointsSettings.forEach((element) => { settings[element.breakpoint] = element.settings; });
     if (breakpoints.length > 0) {
-      breakpoints.sort();
+      breakpoints.sort(sortNumber);
       // Register responsive media queries in settings
       breakpoints.forEach((element, index) => {
         let query;
