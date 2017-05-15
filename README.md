@@ -191,4 +191,5 @@ document.getElementById('root'));
 | scrollOnDevice     | bool | Adds scroll functionality on touch devices instead of normal swipe, this disables lazy-loading, infinite navigation, arrows and dots | false |
 | showSides          | bool | Show outer prev/next slides of the current slide page | false |
 | sidesOpacity       | int | Side slides opacity amount | 1 |
-| sideSize           | int | Fraction visible of prev/next slides, when showSides is enabled | .5 |
+| sideSize           | int | Fraction visible of prev/next slides, when ```showSides``` is enabled | .5 |
+| incrementalSideSize| bool | Dynamic ```sideSize``` depending on the browser's width and responsive ```breakpoints```. Increments or decrements from max size 50% to min size 0% when expanding or narrowing the browser. | false |

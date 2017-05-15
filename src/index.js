@@ -9,6 +9,7 @@ import {
   getSwipeDirection,
   isTouchDevice,
   sortNumber,
+  getScreenWidth,
 } from './common/helpers';
 import InfiniteCarouselArrow from './components/InfiniteCarouselArrow';
 import InfiniteCarouselDots from './components/InfiniteCarouselDots';
@@ -42,6 +43,7 @@ class InfiniteCarousel extends Component {
     showSides: PropTypes.bool,
     sidesOpacity: PropTypes.number,
     sideSize: PropTypes.number,
+    incrementalSideSize: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -67,6 +69,7 @@ class InfiniteCarousel extends Component {
     showSides: false,
     sidesOpacity: 1,
     sideSize: .5,
+    incrementalSideSize: false,
   };
 
   constructor(props) {
@@ -104,6 +107,8 @@ class InfiniteCarousel extends Component {
         lazyLoad: false,
         autoCycle: false,
       },
+      lowerBreakpoint: undefined,
+      higherBreakpoint: undefined,
     };
   }
 
@@ -147,12 +152,18 @@ class InfiniteCarousel extends Component {
       breakpoints.sort(sortNumber);
       // Register responsive media queries in settings
       breakpoints.forEach((element, index) => {
-        let query;
+        let lowerBreakpoint;
+        let higherBreakpoint;
         if (index === 0) {
-          query = { minWidth: 0, maxWidth: element };
+          lowerBreakpoint = 0;
+          higherBreakpoint = element;
         } else {
-          query = { minWidth: breakpoints[index - 1], maxWidth: element };
+          lowerBreakpoint = breakpoints[index - 1];
+          higherBreakpoint = element;
         }
+
+        const query = { minWidth: lowerBreakpoint, maxWidth: higherBreakpoint };
+
         media(query, () => {
           const newSettings = Object.assign(
             {},
@@ -167,6 +178,8 @@ class InfiniteCarousel extends Component {
           this.setState({
             settings: newSettings,
             children,
+            lowerBreakpoint,
+            higherBreakpoint,
           }, this.setDimensions);
         });
       });
@@ -182,19 +195,37 @@ class InfiniteCarousel extends Component {
         this.setState({
           settings: newSettings,
           children,
+          lowerBreakpoint: undefined,
+          higherBreakpoint: undefined,
         }, this.setDimensions);
       });
     }
   };
 
+  getSideSize = (lowerBreakpoint, higherBreakpoint, currentScreenWidth) => {
+    const incrementalSideSize = this.state.settings.incrementalSideSize;
+
+    if (lowerBreakpoint !== undefined && higherBreakpoint !== undefined && incrementalSideSize) {
+      const maxPoint = higherBreakpoint - lowerBreakpoint;
+      const currentPoint = currentScreenWidth - lowerBreakpoint;
+      const sideSizePercetange = (currentPoint * 50) / maxPoint;
+
+      return sideSizePercetange / 100;
+    }
+
+    return this.state.settings.sideSize;
+  };
+
   setDimensions = () => {
     const settings = this.state.settings;
+    const { lowerBreakpoint, higherBreakpoint } = this.state;
     const scrollOnDevice = this.props.scrollOnDevice && isTouchDevice();
-    
+    const currentScreenWidth = getScreenWidth();
+    const sideSize = this.getSideSize(lowerBreakpoint, higherBreakpoint, currentScreenWidth);
     const childrenCount = Children.count(this.props.children);
     const slidesCount =  scrollOnDevice ? childrenCount : Children.count(this.state.children);
     const frameWidth = getElementWidth(this.refs.frame);
-    const slidesToShow = this.props.showSides ? settings.slidesToShow + (settings.sideSize * 2) : settings.slidesToShow;
+    const slidesToShow = this.props.showSides ? settings.slidesToShow + (sideSize * 2) : settings.slidesToShow;
     const slidesWidth = (frameWidth / slidesToShow) - (settings.slidesSpacing * 2);
     const childrenLength = this.props.children.length;
     const activePage = Math.ceil(this.state.currentIndex / settings.slidesToShow);
@@ -222,6 +253,7 @@ class InfiniteCarousel extends Component {
       singlePage,
       lazyLoadedList,
       visibleSlideList,
+      sideSize,
     });
   };
 
@@ -614,7 +646,6 @@ class InfiniteCarousel extends Component {
   getTrackStyles = () => {
     const settings = this.state.settings;
     const touchObject = this.state.touchObject;
-
     let trackWidth = (this.state.slidesWidth + (settings.slidesSpacing * 2));
     trackWidth *= (this.state.slidesCount + (settings.slidesToShow * 2));
     const totalSlideWidth = this.state.slidesWidth + (settings.slidesSpacing * 2);
@@ -627,7 +658,7 @@ class InfiniteCarousel extends Component {
     let trackPosition = initialTrackPostion + slidePosition + touchOffset;
 
     if (settings.showSides) {
-      const sideWidth = totalSlideWidth * settings.sideSize;
+      const sideWidth = totalSlideWidth * this.state.sideSize;
       trackPosition -= sideWidth;
     }
 

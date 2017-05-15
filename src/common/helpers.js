@@ -34,3 +34,7 @@ export function isTouchDevice() {
 export function sortNumber(a, b) {
     return a - b;
 }
+
+export function getScreenWidth() {
+  return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+}
