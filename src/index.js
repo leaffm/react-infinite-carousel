@@ -43,7 +43,7 @@ class InfiniteCarousel extends Component {
     showSides: PropTypes.bool,
     sidesOpacity: PropTypes.number,
     sideSize: PropTypes.number,
-    incrementalSideSize: PropTypes.bool,
+    incrementalSides: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -69,7 +69,7 @@ class InfiniteCarousel extends Component {
     showSides: false,
     sidesOpacity: 1,
     sideSize: .5,
-    incrementalSideSize: false,
+    incrementalSides: false,
   };
 
   constructor(props) {
@@ -203,9 +203,9 @@ class InfiniteCarousel extends Component {
   };
 
   getSideSize = (lowerBreakpoint, higherBreakpoint, currentScreenWidth) => {
-    const incrementalSideSize = this.state.settings.incrementalSideSize;
+    const incrementalSides = this.state.settings.incrementalSides;
 
-    if (lowerBreakpoint !== undefined && higherBreakpoint !== undefined && incrementalSideSize) {
+    if (lowerBreakpoint !== undefined && higherBreakpoint !== undefined && incrementalSides) {
       const maxPoint = higherBreakpoint - lowerBreakpoint;
       const currentPoint = currentScreenWidth - lowerBreakpoint;
       const sideSizePercetange = (currentPoint * 50) / maxPoint;

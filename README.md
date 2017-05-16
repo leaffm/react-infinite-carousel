@@ -171,7 +171,7 @@ document.getElementById('root'));
 ### Properties
 
 |    Property    	 | Type |          Description          | Default |
-| ------------------ | ---- |          -----------          | ------- |
+| ---------------- | ---- |          -----------          | ------- |
 | arrows         	 | bool | Enables tabbing and arrow key navigation | true |
 | dots      	 	 | bool | Enable dot pagination | false |
 | lazyLoad		 	 | bool | Lazy load slides that are not visible at first load | true |
@@ -192,4 +192,4 @@ document.getElementById('root'));
 | showSides          | bool | Show outer prev/next slides of the current slide page | false |
 | sidesOpacity       | int | Side slides opacity amount | 1 |
 | sideSize           | int | Fraction visible of prev/next slides, when ```showSides``` is enabled | .5 |
-| incrementalSideSize| bool | Dynamic ```sideSize``` depending on the browser's width and responsive ```breakpoints```. Increments or decrements from max size 50% to min size 0% when expanding or narrowing the browser. | false |
+| incrementalSides   | bool | Dynamic ```sideSize``` depending on the browser's width and responsive ```breakpoints```. Increments or decrements from max size 50% to min size 0% when expanding or narrowing the browser. | false |
