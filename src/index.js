@@ -656,9 +656,9 @@ class InfiniteCarousel extends Component {
     const touchOffset = hasTouchOffset ? touchObject.length * touchObject.direction : 0;
     const slidePosition = totalSlideWidth * this.state.currentIndex;
     let trackPosition = initialTrackPostion + slidePosition + touchOffset;
+    const sideWidth = totalSlideWidth * this.state.sideSize;
 
     if (settings.showSides) {
-      const sideWidth = totalSlideWidth * this.state.sideSize;
       trackPosition -= sideWidth;
     }
 
@@ -672,10 +672,17 @@ class InfiniteCarousel extends Component {
       transform: !this.state.singlePage ? `translate(${-trackPosition}px, 0px)` : 'none',
       boxSizing: 'border-box',
       MozBoxSizing: 'border-box',
+      marginLeft: !this.state.singlePage ? '0px' : `${sideWidth}px`,
     };
   };
 
   getScrollTrackStyles = () => {
+    let sideWidth;
+    if (settings.showSides) {
+      sideWidth = totalSlideWidth * this.state.sideSize;
+    } else {
+      sideWidth = 0;
+    }
     return {
       clear: 'both',
       position: 'relative',
@@ -685,6 +692,7 @@ class InfiniteCarousel extends Component {
       padding: 0,
       boxSizing: 'border-box',
       MozBoxSizing: 'border-box',
+      marginLeft: `${sideWidth}px`,
     };
   };
 
