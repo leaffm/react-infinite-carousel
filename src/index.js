@@ -156,10 +156,10 @@ class InfiniteCarousel extends Component {
         let higherBreakpoint;
         if (index === 0) {
           lowerBreakpoint = 0;
-          higherBreakpoint = element;
+          higherBreakpoint = element - 1;
         } else {
           lowerBreakpoint = breakpoints[index - 1];
-          higherBreakpoint = element;
+          higherBreakpoint = element - 1;
         }
 
         const query = { minWidth: lowerBreakpoint, maxWidth: higherBreakpoint };
@@ -186,7 +186,7 @@ class InfiniteCarousel extends Component {
 
       // Resize from small to large
       breakpoints.reverse();
-      const query = { minWidth: (breakpoints[0] + 1) };
+      const query = { minWidth: breakpoints[0] };
       media(query, () => {
         const newSettings = Object.assign({}, this.defaultProps, this.props, scrollOnDeviceProps);
         const scrollOnDevice = this.props.scrollOnDevice && isTouchDevice();
@@ -468,16 +468,25 @@ class InfiniteCarousel extends Component {
     if (this.state.animating) {
       return;
     }
+    if (this.state.autoCycle && this.state.autoCycleTimer) {
+      clearInterval(this.state.autoCycleTimer);
+    }
     const settings = this.state.settings;
     const targetIndex = this.state.currentIndex + settings.slidesToScroll;
     const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
     this.handleTrack(targetIndex, currentIndex);
+    if (this.state.autoCycle) {
+      this.playAutoCycle();
+    }
   };
 
   moveToPrevious = (event) => {
     event.preventDefault();
     if (this.state.animating) {
       return;
+    }
+    if (this.state.autoCycle && this.state.autoCycleTimer) {
+      clearInterval(this.state.autoCycleTimer);
     }
     const settings = this.state.settings;
     let targetIndex = this.state.currentIndex - settings.slidesToScroll;
@@ -486,6 +495,9 @@ class InfiniteCarousel extends Component {
       targetIndex = 0;
     }
     this.handleTrack(targetIndex, currentIndex);
+    if (this.state.autoCycle) {
+      this.playAutoCycle();
+    }
   };
 
   onDotClick = (event) => {
@@ -493,11 +505,17 @@ class InfiniteCarousel extends Component {
     if (this.state.animating) {
       return;
     }
+    if (this.state.autoCycle && this.state.autoCycleTimer) {
+      clearInterval(this.state.autoCycleTimer);
+    }
     const settings = this.state.settings;
     const slidesToShow = settings.slidesToShow;
     const targetIndex = event.target.parentElement.getAttribute('data-index');
     const currentIndex = this.getTargetIndex(targetIndex * slidesToShow, slidesToShow);
     this.handleTrack(targetIndex * slidesToShow, currentIndex);
+    if (this.state.autoCycle) {
+      this.playAutoCycle();
+    }
   };
 
   onWindowResized = () => {
