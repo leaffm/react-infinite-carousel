@@ -468,14 +468,17 @@ class InfiniteCarousel extends Component {
     if (this.state.animating) {
       return;
     }
-    if (this.state.autoCycle && this.state.autoCycleTimer) {
+    if (this.state.settings.autoCycle && this.state.autoCycleTimer) {
       clearInterval(this.state.autoCycleTimer);
+      this.setState({
+        autoCycleTimer: null
+      });
     }
     const settings = this.state.settings;
     const targetIndex = this.state.currentIndex + settings.slidesToScroll;
     const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
     this.handleTrack(targetIndex, currentIndex);
-    if (this.state.autoCycle) {
+    if (this.state.settings.autoCycle) {
       this.playAutoCycle();
     }
   };
@@ -485,8 +488,11 @@ class InfiniteCarousel extends Component {
     if (this.state.animating) {
       return;
     }
-    if (this.state.autoCycle && this.state.autoCycleTimer) {
+    if (this.state.settings.autoCycle && this.state.autoCycleTimer) {
       clearInterval(this.state.autoCycleTimer);
+      this.setState({
+        autoCycleTimer: null
+      });
     }
     const settings = this.state.settings;
     let targetIndex = this.state.currentIndex - settings.slidesToScroll;
@@ -495,7 +501,7 @@ class InfiniteCarousel extends Component {
       targetIndex = 0;
     }
     this.handleTrack(targetIndex, currentIndex);
-    if (this.state.autoCycle) {
+    if (this.state.settings.autoCycle) {
       this.playAutoCycle();
     }
   };
@@ -505,15 +511,18 @@ class InfiniteCarousel extends Component {
     if (this.state.animating) {
       return;
     }
-    if (this.state.autoCycle && this.state.autoCycleTimer) {
+    if (this.state.settings.autoCycle && this.state.autoCycleTimer) {
       clearInterval(this.state.autoCycleTimer);
+      this.setState({
+        autoCycleTimer: null
+      });
     }
     const settings = this.state.settings;
     const slidesToShow = settings.slidesToShow;
     const targetIndex = event.target.parentElement.getAttribute('data-index');
     const currentIndex = this.getTargetIndex(targetIndex * slidesToShow, slidesToShow);
     this.handleTrack(targetIndex * slidesToShow, currentIndex);
-    if (this.state.autoCycle) {
+    if (this.state.settings.autoCycle) {
       this.playAutoCycle();
     }
   };
