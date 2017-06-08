@@ -695,12 +695,6 @@ class InfiniteCarousel extends Component {
   };
 
   getScrollTrackStyles = () => {
-    let sideWidth;
-    if (settings.showSides) {
-      sideWidth = totalSlideWidth * this.state.sideSize;
-    } else {
-      sideWidth = 0;
-    }
     return {
       clear: 'both',
       position: 'relative',
@@ -710,7 +704,6 @@ class InfiniteCarousel extends Component {
       padding: 0,
       boxSizing: 'border-box',
       MozBoxSizing: 'border-box',
-      marginLeft: `${sideWidth}px`,
     };
   };
 
