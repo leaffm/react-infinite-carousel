@@ -1,8 +1,8 @@
 import React, {
   Component,
-  PropTypes,
   Children,
 } from 'react';
+import PropTypes from 'prop-types';
 import { media } from 'react-responsive-mixin';
 import {
   getElementWidth,
@@ -627,21 +627,31 @@ class InfiniteCarousel extends Component {
   onSwipeEnd = () => {
     const swipeLength = this.state.touchObject.length;
     if (swipeLength !== 0 && swipeLength > this.state.slidesWidth / 2) {
+      if (this.state.settings.autoCycle && this.state.autoCycleTimer) {
+        clearInterval(this.state.autoCycleTimer);
+        this.setState({
+          autoCycleTimer: null
+        });
+      }
+
+      const settings = this.state.settings;
+      let targetIndex, currentIndex;
       if (this.state.touchObject.direction === 1) {
         // Next
-        const settings = this.state.settings;
-        const targetIndex = this.state.currentIndex + settings.slidesToScroll;
-        const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
-        this.handleTrack(targetIndex, currentIndex);
+        targetIndex = this.state.currentIndex + settings.slidesToScroll;
+        currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
       } else {
         // Previous
-        const settings = this.state.settings;
-        let targetIndex = this.state.currentIndex - settings.slidesToScroll;
-        const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
+        targetIndex = this.state.currentIndex - settings.slidesToScroll;
+        currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
         if (targetIndex < 0 && this.state.currentIndex !== 0) {
           targetIndex = 0;
         }
-        this.handleTrack(targetIndex, currentIndex);
+      }
+      this.handleTrack(targetIndex, currentIndex);
+
+      if (this.state.settings.autoCycle) {
+        this.playAutoCycle();
       }
     } else {
       const callback = () => {

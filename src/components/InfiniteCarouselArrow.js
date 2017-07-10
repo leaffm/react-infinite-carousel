@@ -1,7 +1,7 @@
 import React, {
   Component,
-  PropTypes,
 } from 'react';
+import PropTypes from 'prop-types';
 
 class InfiniteCarouselArrow extends Component {
   render() {
