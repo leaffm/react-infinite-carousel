@@ -709,7 +709,7 @@ class InfiniteCarousel extends Component {
       transform: !this.state.singlePage ? `translate(${-trackPosition}px, 0px)` : 'none',
       boxSizing: 'border-box',
       MozBoxSizing: 'border-box',
-      marginLeft: !this.state.singlePage ? '0px' : `${sideWidth}px`,
+      marginLeft: this.state.singlePage && settings.showSides ? `${sideWidth}px` : '0px',
     };
   };
 
