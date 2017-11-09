@@ -122,6 +122,7 @@ class InfiniteCarousel extends Component {
     if (!window) {
       return;
     }
+
     if (window.addEventListener) {
       window.addEventListener('resize', this.onWindowResized);
     } else {
@@ -162,6 +163,7 @@ class InfiniteCarousel extends Component {
           higherBreakpoint = element - 1;
         }
 
+        // assign breakpoints properties
         const query = { minWidth: lowerBreakpoint, maxWidth: higherBreakpoint };
 
         media(query, () => {
@@ -471,7 +473,7 @@ class InfiniteCarousel extends Component {
     if (this.state.settings.autoCycle && this.state.autoCycleTimer) {
       clearInterval(this.state.autoCycleTimer);
       this.setState({
-        autoCycleTimer: null
+        autoCycleTimer: null,
       });
     }
     const settings = this.state.settings;
