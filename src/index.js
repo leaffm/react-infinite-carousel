@@ -692,10 +692,6 @@ class InfiniteCarousel extends Component {
     let trackPosition = initialTrackPostion + slidePosition + touchOffset;
     const sideWidth = totalSlideWidth * this.state.sideSize;
 
-    console.log('getTrackStyles');
-    console.log(trackWidth);
-    console.log(this.state.singlePage);
-
     if (settings.showSides) {
       trackPosition -= sideWidth;
     }
