@@ -64,7 +64,7 @@ const config = {
       },
       {
         test: /(\.jsx|\.js)$/,
-        loader: 'babel',
+        loader: 'babel-loader',
         exclude: /(node_modules|bower_components)/,
         query: {
           cacheDirectory: true,
@@ -83,8 +83,9 @@ const config = {
     ]
   },
   resolve: {
-    root: path.resolve('./src'),
-    extensions: ['', '.js']
+    //main: path.resolve('./src'),
+    modules: [path.resolve('./src'), path.resolve('./public'), "node_modules"],
+    extensions: ['.js']
   },
   externals: externals,
 };

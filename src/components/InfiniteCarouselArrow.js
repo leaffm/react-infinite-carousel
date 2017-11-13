@@ -1,34 +1,34 @@
-import React, {
-  Component,
-} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
-class InfiniteCarouselArrow extends Component {
-  render() {
-    const arrowClassName = this.props.styles.InfiniteCarouselArrow;
-    let typeClassName;
-    if (this.props.next) {
-      typeClassName = this.props.styles.InfiniteCarouselArrowNext;
-    } else {
-      typeClassName = this.props.styles.InfiniteCarouselArrowPrev;
-    }
-
-    const iconClassName = this.props.styles.InfiniteCarouselArrowIcon;
-    let iconTypeClassName;
-    if (this.props.next) {
-      iconTypeClassName = this.props.styles.InfiniteCarouselArrowNextIcon;
-    } else {
-      iconTypeClassName = this.props.styles.InfiniteCarouselArrowPrevIcon;
-    }
-    return (
-      <button
-        className={`${arrowClassName} ${typeClassName}`}
-        onClick={this.props.onClick}
-      >
-        <i className={`${iconClassName} ${iconTypeClassName}`} />
-      </button>
-    );
+function InfiniteCarouselArrow({ next, onClick, styles }) {
+  const arrowClassName = styles.InfiniteCarouselArrow;
+  let typeClassName;
+  if (next) {
+    typeClassName = styles.InfiniteCarouselArrowNext;
+  } else {
+    typeClassName = styles.InfiniteCarouselArrowPrev;
   }
+
+  const iconClassName = styles.InfiniteCarouselArrowIcon;
+  let iconTypeClassName;
+  if (next) {
+    iconTypeClassName = styles.InfiniteCarouselArrowNextIcon;
+  } else {
+    iconTypeClassName = styles.InfiniteCarouselArrowPrevIcon;
+  }
+
+  const className = `${arrowClassName} ${typeClassName}`;
+  const classNameIcon = `${iconClassName} ${iconTypeClassName}`;
+
+  return (
+    <button
+      className={className}
+      onClick={onClick}
+    >
+      <i className={classNameIcon} />
+    </button>
+  );
 }
 
 InfiniteCarouselArrow.propTypes = {

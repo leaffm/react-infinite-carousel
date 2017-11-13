@@ -36,6 +36,8 @@
   display: inline-block;
   list-style: none;
   margin: 0 5px;
+  border: 0;
+  background: none;
   cursor: pointer;
 }
 

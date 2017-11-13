@@ -6,29 +6,29 @@ import InfiniteCarousel from '../src/index';
 React.initializeTouchEvents && React.initializeTouchEvents(true);
 ReactDOM.render(
   <InfiniteCarousel
+    dots
+    scrollOnDevice
+    showSides
+    sideSize={0.1}
+    sidesOpacity={0.5}
+    slidesToScroll={4}
+    slidesToShow={4}
     breakpoints={[
       {
         breakpoint: 500,
         settings: {
-          slidesToShow: 2,
           slidesToScroll: 2,
+          slidesToShow: 2,
         },
       },
       {
         breakpoint: 768,
         settings: {
-          slidesToShow: 3,
           slidesToScroll: 3,
+          slidesToShow: 3,
         },
       },
     ]}
-    dots={true}
-    showSides={true}
-    sidesOpacity={.5}
-    sideSize={.1}
-    slidesToScroll={4}
-    slidesToShow={4}
-    scrollOnDevice={true}
   >
     <div>
       <img
@@ -151,4 +151,5 @@ ReactDOM.render(
       />
     </div>
   </InfiniteCarousel>,
-document.getElementById('root'));
+  document.getElementById('root'),
+);

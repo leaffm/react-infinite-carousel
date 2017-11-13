@@ -1,36 +1,28 @@
-import React, {
-  Component,
-} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
-class InfiniteCarouselDots extends Component {
+function InfiniteCarouselDots({
+  numberOfDots, activePage, onClick, styles,
+}) {
+  const dots = [];
+  const className = styles.InfiniteCarouselDots;
+  const dotClassName = styles.InfiniteCarouselDot;
+  const dotIconClassName = styles.InfiniteCarouselDotIcon;
+  const activeClass = styles.InfiniteCarouselDotActiveIcon;
+  let classNameIcon;
 
-  render() {
-    const dots = [];
-    const className = this.props.styles.InfiniteCarouselDots;
-    const dotClassName = this.props.styles.InfiniteCarouselDot;
-    const dotIconClassName = this.props.styles.InfiniteCarouselDotIcon;
-    const activeClass = this.props.styles.InfiniteCarouselDotActiveIcon;
-
-    for (let i = 0; i < this.props.numberOfDots; i += 1) {
-      dots.push(
-        <li
-          className={dotClassName}
-          data-index={i}
-          key={i + 1}
-          onClick={this.props.onClick}
-        >
-          <i className={`${dotIconClassName} ${i === this.props.activePage ? activeClass : ''}`} />
-        </li>,
-      );
-    }
-
-    return (
-      <ul className={className}>
-        {dots}
-      </ul>
-    );
+  for (let i = 0; i < numberOfDots; i += 1) {
+    classNameIcon = `${dotIconClassName} ${i === activePage ? activeClass : ''}`;
+    dots.push(<button className={dotClassName} data-index={i} key={i + 1} onClick={onClick}>
+      <i className={classNameIcon} />
+    </button>); // eslint-disable-line react/jsx-closing-tag-location
   }
+
+  return (
+    <ul className={className}>
+      {dots}
+    </ul>
+  );
 }
 
 InfiniteCarouselDots.propTypes = {

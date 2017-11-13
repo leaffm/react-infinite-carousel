@@ -79,12 +79,15 @@ module.exports = {
     "react/no-multi-comp": 1,
     "react/no-set-state": 0,
     "react/no-unknown-property": 1,
+    "react/no-unused-prop-types":1,
     "react/prefer-es6-class": 1,
     "react/prop-types": 1,
     "react/react-in-jsx-scope": 1,
     "react/require-extension": 0,
     "react/self-closing-comp": 1,
     "react/sort-comp": 1,
-    "react/jsx-wrap-multilines": 1
+    "react/jsx-wrap-multilines": 1,
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/forbid-prop-types":1
   }
 };
