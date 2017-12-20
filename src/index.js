@@ -846,7 +846,7 @@ class InfiniteCarousel extends Component {
     let trackClassName;
 
     if (this.props.scrollOnDevice && isTouchDevice()) {
-      trackStyles = this.getScrollTrackStyles();
+      trackStyles = Object.assign({}, this.getScrollTrackStyles);
       trackClassName = styles.InfiniteCarouselScrollTrack;
     } else {
       trackStyles = this.getTrackStyles();
