@@ -7,12 +7,9 @@ React.initializeTouchEvents && React.initializeTouchEvents(true);
 ReactDOM.render(
   <InfiniteCarousel
     dots
+    paging
     scrollOnDevice
     showSides
-    sideSize={0.1}
-    sidesOpacity={0.5}
-    slidesToScroll={4}
-    slidesToShow={4}
     breakpoints={[
       {
         breakpoint: 500,
@@ -29,6 +26,10 @@ ReactDOM.render(
         },
       },
     ]}
+    sideSize={0.1}
+    sidesOpacity={0.5}
+    slidesToScroll={4}
+    slidesToShow={4}
   >
     <div>
       <img

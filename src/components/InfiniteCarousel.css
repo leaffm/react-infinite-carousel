@@ -24,6 +24,17 @@
   width: 100%;
 }
 
+.InfiniteCarouselPaging {
+  position: absolute;
+  left: 50%;
+  bottom: -60px;
+  padding: 0;
+  transform: translateX(-20%);
+  font-family: Arial;
+  letter-spacing: 2px;
+  color: #888;
+}
+
 .InfiniteCarouselDots {
   position: absolute;
   left: 50%;
