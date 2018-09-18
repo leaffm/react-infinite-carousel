@@ -24,6 +24,7 @@ class InfiniteCarousel extends Component {
     arrows: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
     dots: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
     paging: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
+    pagingSeparator: PropTypes.string,
     lazyLoad: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
     swipe: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
     draggable: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
@@ -64,6 +65,7 @@ class InfiniteCarousel extends Component {
     responsive: true,
     breakpoints: [],
     placeholderImageSrc: '',
+    pagingSeparator: '/',
     nextArrow: null,
     prevArrow: null,
     scrollOnDevice: false,
@@ -846,7 +848,7 @@ class InfiniteCarousel extends Component {
     if (settings.paging && !this.state.singlePage && !scrollOnDevice) {
       dots = (
         <span className={styles.InfiniteCarouselPaging}>
-          { `${this.state.activePage + 1}/${this.state.slidePages}` }
+          { `${this.state.activePage + 1} ${this.props.pagingSeparator} ${this.state.slidePages}` }
         </span>
       );
     }

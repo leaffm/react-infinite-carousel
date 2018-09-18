@@ -164,7 +164,7 @@ ReactDOM.render(
       />
     </div>
   </InfiniteCarousel>
-, 
+,
 document.getElementById('root'));
 ```
 
@@ -173,8 +173,10 @@ document.getElementById('root'));
 |    Property    	 | Type |          Description          | Default |
 | ---------------- | ---- |          -----------          | ------- |
 | arrows         	 | bool | Enables tabbing and arrow key navigation | true |
-| dots      	 	 | bool | Enable dot pagination | false |
-| lazyLoad		 	 | bool | Lazy load slides that are not visible at first load | true |
+| dots      	 	   | bool | Enable dot pagination | false |
+| paging      	 	 | bool | Enable 1/x pagination | false |
+| pagingSeparator  | string | 1/x pagination separator | '/' |
+| lazyLoad		 	   | bool | Lazy load slides that are not visible at first load | true |
 | swipe          	 | bool | Add swipe event to scroll between slide pages | true |
 | animationDuration  | int | Slide animation duration | 500 |
 | slidesToShow       | int | Number of slides to display | 1
