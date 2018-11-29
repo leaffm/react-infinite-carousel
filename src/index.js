@@ -46,6 +46,8 @@ class InfiniteCarousel extends Component {
     sideSize: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
     incrementalSides: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types,
     onSlideChange: PropTypes.func,
+    onNextClick: PropTypes.func,
+    onPreviousClick: PropTypes.func,
   };
   static defaultProps = {
     children: [],
@@ -74,6 +76,8 @@ class InfiniteCarousel extends Component {
     sideSize: 0.5,
     incrementalSides: false,
     onSlideChange: undefined,
+    onNextClick: undefined,
+    onPreviousClick: undefined,
   };
 
   constructor(props) {
@@ -728,6 +732,9 @@ class InfiniteCarousel extends Component {
 
   moveToNext = (event) => {
     event.preventDefault();
+    if (this.props.onNextClick) {
+      this.props.onNextClick(event);
+    }
     if (this.state.animating) {
       return;
     }
@@ -748,6 +755,9 @@ class InfiniteCarousel extends Component {
 
   moveToPrevious = (event) => {
     event.preventDefault();
+    if (this.props.onPreviousClick) {
+      this.props.onPreviousClick(event);
+    }
     if (this.state.animating) {
       return;
     }

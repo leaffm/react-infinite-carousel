@@ -195,3 +195,6 @@ document.getElementById('root'));
 | sidesOpacity       | int | Side slides opacity amount | 1 |
 | sideSize           | int | Fraction visible of prev/next slides, when ```showSides``` is enabled | .5 |
 | incrementalSides   | bool | Dynamic ```sideSize``` depending on the browser's width and responsive ```breakpoints```. Increments or decrements from max size 50% to min size 0% when expanding or narrowing the browser. | false |
+| onSlideChange      | func | onSlideChange event | - |
+| onNextClick        | func | onNextClick arrow event | - |
+| onPreviousClick    | func | onPreviousClick arrow event | - |

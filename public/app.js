@@ -30,6 +30,8 @@ ReactDOM.render(
     sidesOpacity={0.5}
     slidesToScroll={4}
     slidesToShow={4}
+    onNextClick={() => { console.log('onNextClick'); }}
+    onPreviousClick={() => { console.log('onPreviousClick'); }}
   >
     <div>
       <img
