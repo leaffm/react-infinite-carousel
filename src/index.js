@@ -597,12 +597,14 @@ class InfiniteCarousel extends Component {
           </li>
         );
       }
+
       return (
         <li
           className={styles.InfiniteCarouselSlide}
           key={uniqid('slide-')}
           style={this.getSlideStyles(isVisible)}
         >
+          <noscript>{child}</noscript>
           <img alt="placeholder" src={settings.placeholderImageSrc} />
         </li>
       );
