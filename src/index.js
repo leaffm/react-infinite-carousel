@@ -819,7 +819,7 @@ class InfiniteCarousel extends Component {
   };
 
   render() {
-    const { scrollOnDevice, pagingSeparator } = this.props;
+    const { scrollOnDevice, pagingSeparator, name } = this.props;
     const hasScrollOnDevice = scrollOnDevice && isTouchDevice();
     const { settings, singlePage, activePage, slidePages, dragging } = this.state;
     let prevArrow;
@@ -829,7 +829,12 @@ class InfiniteCarousel extends Component {
     if (settings.arrows && !singlePage && !hasScrollOnDevice) {
       if (settings.prevArrow == null) {
         prevArrow = (
-          <InfiniteCarouselArrow next={false} styles={styles} onClick={this.moveToPrevious} />
+          <InfiniteCarouselArrow
+            carouselName={name}
+            next={false}
+            styles={styles}
+            onClick={this.moveToPrevious}
+          />
         );
       } else {
         const prevArrowProps = {
@@ -839,7 +844,9 @@ class InfiniteCarousel extends Component {
       }
 
       if (settings.nextArrow == null) {
-        nextArrow = <InfiniteCarouselArrow styles={styles} onClick={this.moveToNext} />;
+        nextArrow = (
+          <InfiniteCarouselArrow carouselName={name} styles={styles} onClick={this.moveToNext} />
+        );
       } else {
         const nextArrowProps = {
           onClick: this.moveToNext,
@@ -851,6 +858,7 @@ class InfiniteCarousel extends Component {
     if (settings.dots && !singlePage && !hasScrollOnDevice) {
       dots = (
         <InfiniteCarouselDots
+          carouselName={name}
           activePage={activePage}
           numberOfDots={slidePages}
           styles={styles}
@@ -861,7 +869,7 @@ class InfiniteCarousel extends Component {
 
     if (settings.paging && !singlePage && !hasScrollOnDevice) {
       dots = (
-        <span className={styles.InfiniteCarouselPaging}>
+        <span data-testid={`${name}-paging`} className={styles.InfiniteCarouselPaging}>
           {`${activePage + 1} ${pagingSeparator} ${slidePages}`}
         </span>
       );
@@ -888,6 +896,8 @@ class InfiniteCarousel extends Component {
 
     return (
       <div
+        id={name}
+        data-testid={name}
         className={styles.InfiniteCarousel}
         onFocus={this.onMouseOver}
         onMouseEnter={this.onMouseEnter}
@@ -920,6 +930,7 @@ class InfiniteCarousel extends Component {
 
 InfiniteCarousel.propTypes = {
   children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
+  name: PropTypes.string,
   arrows: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
   dots: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
   paging: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
@@ -951,6 +962,7 @@ InfiniteCarousel.propTypes = {
 
 InfiniteCarousel.defaultProps = {
   children: [],
+  name: 'infinite-carousel',
   arrows: true,
   dots: false,
   paging: false,
