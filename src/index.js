@@ -11,7 +11,7 @@ import {
 } from './common/helpers';
 import InfiniteCarouselArrow from './components/InfiniteCarouselArrow';
 import InfiniteCarouselDots from './components/InfiniteCarouselDots';
-import styles from './components/InfiniteCarousel.css';
+import './components/InfiniteCarousel.css';
 
 class InfiniteCarousel extends Component {
   constructor(props) {
@@ -589,7 +589,7 @@ class InfiniteCarousel extends Component {
       if (!settings.lazyLoad || lazyLoadedList.indexOf(index) >= 0) {
         return (
           <li
-            className={styles.InfiniteCarouselSlide}
+            className="InfiniteCarouselSlide"
             key={uniqid('slide-')}
             style={this.getSlideStyles(isVisible)}
           >
@@ -600,7 +600,7 @@ class InfiniteCarousel extends Component {
 
       return (
         <li
-          className={styles.InfiniteCarouselSlide}
+          className="InfiniteCarouselSlide"
           key={uniqid('slide-')}
           style={this.getSlideStyles(isVisible)}
         >
@@ -831,12 +831,7 @@ class InfiniteCarousel extends Component {
     if (settings.arrows && !singlePage && !hasScrollOnDevice) {
       if (settings.prevArrow == null) {
         prevArrow = (
-          <InfiniteCarouselArrow
-            carouselName={name}
-            next={false}
-            styles={styles}
-            onClick={this.moveToPrevious}
-          />
+          <InfiniteCarouselArrow carouselName={name} next={false} onClick={this.moveToPrevious} />
         );
       } else {
         const prevArrowProps = {
@@ -846,9 +841,7 @@ class InfiniteCarousel extends Component {
       }
 
       if (settings.nextArrow == null) {
-        nextArrow = (
-          <InfiniteCarouselArrow carouselName={name} styles={styles} onClick={this.moveToNext} />
-        );
+        nextArrow = <InfiniteCarouselArrow carouselName={name} onClick={this.moveToNext} />;
       } else {
         const nextArrowProps = {
           onClick: this.moveToNext,
@@ -863,7 +856,6 @@ class InfiniteCarousel extends Component {
           carouselName={name}
           activePage={activePage}
           numberOfDots={slidePages}
-          styles={styles}
           onClick={this.onDotClick}
         />
       );
@@ -871,7 +863,7 @@ class InfiniteCarousel extends Component {
 
     if (settings.paging && !singlePage && !hasScrollOnDevice) {
       dots = (
-        <span data-testid={`${name}-paging`} className={styles.InfiniteCarouselPaging}>
+        <span data-testid={`${name}-paging`} className="InfiniteCarouselPaging">
           {`${activePage + 1} ${pagingSeparator} ${slidePages}`}
         </span>
       );
@@ -886,7 +878,7 @@ class InfiniteCarousel extends Component {
       trackStyles = {
         ...this.getScrollTrackStyles,
       };
-      trackClassName = styles.InfiniteCarouselScrollTrack;
+      trackClassName = 'InfiniteCarouselScrollTrack';
     } else {
       trackStyles = {
         ...this.getTrackStyles(),
@@ -900,14 +892,14 @@ class InfiniteCarousel extends Component {
       <div
         id={name}
         data-testid={name}
-        className={styles.InfiniteCarousel}
+        className="InfiniteCarousel"
         onFocus={this.onMouseOver}
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
         onMouseOver={this.onMouseOver}
       >
         {prevArrow}
-        <div className={styles.InfiniteCarouselFrame} ref={this.storeFrameRef}>
+        <div className="InfiniteCarouselFrame" ref={this.storeFrameRef}>
           <ul
             className={trackClassName}
             style={trackStyles}

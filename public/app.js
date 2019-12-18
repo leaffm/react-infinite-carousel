@@ -10,18 +10,17 @@ ReactDOM.render(
     paging
     scrollOnDevice
     showSides
-    lazyLoad
     responsive
     breakpoints={[
       {
-        breakpoint: 500,
+        breakpoint: 768,
         settings: {
           slidesToScroll: 2,
           slidesToShow: 2,
         },
       },
       {
-        breakpoint: 768,
+        breakpoint: 1200,
         settings: {
           slidesToScroll: 3,
           slidesToShow: 3,

@@ -1,22 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from './InfiniteCarousel.css';
+import './InfiniteCarousel.css';
 
 function InfiniteCarouselArrow({ carouselName, next, onClick }) {
-  const arrowClassName = styles.InfiniteCarouselArrow;
+  const arrowClassName = 'InfiniteCarouselArrow';
   let typeClassName;
   if (next) {
-    typeClassName = styles.InfiniteCarouselArrowNext;
+    typeClassName = 'InfiniteCarouselArrowNext';
   } else {
-    typeClassName = styles.InfiniteCarouselArrowPrev;
+    typeClassName = 'InfiniteCarouselArrowPrev';
   }
 
-  const iconClassName = styles.InfiniteCarouselArrowIcon;
+  const iconClassName = 'InfiniteCarouselArrowIcon';
   let iconTypeClassName;
   if (next) {
-    iconTypeClassName = styles.InfiniteCarouselArrowNextIcon;
+    iconTypeClassName = 'InfiniteCarouselArrowNextIcon';
   } else {
-    iconTypeClassName = styles.InfiniteCarouselArrowPrevIcon;
+    iconTypeClassName = 'InfiniteCarouselArrowPrevIcon';
   }
 
   const className = `${arrowClassName} ${typeClassName}`;

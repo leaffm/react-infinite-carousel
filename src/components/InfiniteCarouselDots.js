@@ -1,24 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from './InfiniteCarousel.css';
+import './InfiniteCarousel.css';
 
 function InfiniteCarouselDots({ carouselName, numberOfDots, activePage, onClick }) {
   const dots = [];
-  const className = styles.InfiniteCarouselDots;
-  const dotClassName = styles.InfiniteCarouselDot;
-  const dotIconClassName = styles.InfiniteCarouselDotIcon;
-  const activeClass = styles.InfiniteCarouselDotActiveIcon;
   let classNameIcon;
   let dotName;
 
   for (let i = 0; i < numberOfDots; i += 1) {
-    classNameIcon = `${dotIconClassName} ${i === activePage ? activeClass : ''}`;
+    classNameIcon = `InfiniteCarouselDotIcon ${
+      i === activePage ? 'InfiniteCarouselDotActiveIcon' : ''
+    }`;
     dotName = `${carouselName}-dots-${i}`;
     dots.push(
       <button
         name={dotName}
         data-testid={dotName}
-        className={dotClassName}
+        className="InfiniteCarouselDot"
         data-index={i}
         key={i + 1}
         onClick={onClick}
@@ -30,7 +28,7 @@ function InfiniteCarouselDots({ carouselName, numberOfDots, activePage, onClick 
   }
 
   return (
-    <ul data-testid={`${carouselName}-dots`} className={className}>
+    <ul data-testid={`${carouselName}-dots`} className="InfiniteCarouselDots">
       {dots}
     </ul>
   );
