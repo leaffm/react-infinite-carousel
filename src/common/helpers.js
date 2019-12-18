@@ -15,13 +15,13 @@ export function getSwipeDirection(x1, x2, y1, y2) {
   if (swipeAngle < 0) {
     swipeAngle = 360 - Math.abs(swipeAngle);
   }
-  if ((swipeAngle <= 45) && (swipeAngle >= 0)) {
+  if (swipeAngle <= 45 && swipeAngle >= 0) {
     return 1;
   }
-  if ((swipeAngle <= 360) && (swipeAngle >= 315)) {
+  if (swipeAngle <= 360 && swipeAngle >= 315) {
     return 1;
   }
-  if ((swipeAngle >= 135) && (swipeAngle <= 225)) {
+  if (swipeAngle >= 135 && swipeAngle <= 225) {
     return -1;
   }
   return 0;

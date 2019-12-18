@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import InfiniteCarousel from '../src/index';
 
-React.initializeTouchEvents && React.initializeTouchEvents(true);
+React.initializeTouchEvents && React.initializeTouchEvents(true); // eslint-disable-line no-unused-expressions
 ReactDOM.render(
   <InfiniteCarousel
     dots
@@ -30,129 +30,69 @@ ReactDOM.render(
     sidesOpacity={0.5}
     slidesToScroll={4}
     slidesToShow={4}
-    onNextClick={() => { console.log('onNextClick'); }}
-    onPreviousClick={() => { console.log('onPreviousClick'); }}
+    onNextClick={() => {}}
+    onPreviousClick={() => {}}
   >
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=55b64e&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/55b64e/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=904098&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/904098/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ef4d9c&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/ef4d9c/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=00f3d1&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/00f3d1/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=00ffff&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/00ffff/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ee1f34&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/ee1f34/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=91b4c0&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/91b4c0/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6347&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/ff6347/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ebbfbf&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/ebbfbf/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=def1f9&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/def1f9/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=cdf2c6&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/cdf2c6/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=9fa616&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/9fa616/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=2c4caa&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/2c4caa/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=44e3e1&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/44e3e1/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ff6666&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/ff6666/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=94e1e3&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/94e1e3/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=29083c&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/29083c/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ffff99&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/ffff99/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=616161&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/616161/fff&fontsize=20" />
     </div>
     <div>
-      <img
-        alt=''
-        src='https://placeholdit.imgix.net/~text?txtsize=20&bg=ed7ebe&txtclr=ffffff&txt=215%C3%97215&w=215&h=215'
-      />
+      <img alt="" src="https://place-hold.it/215x215/ed7ebe/fff&fontsize=20" />
     </div>
   </InfiniteCarousel>,
-  document.getElementById('root'),
+  document.getElementById('root')
 );

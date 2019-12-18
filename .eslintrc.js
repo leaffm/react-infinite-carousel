@@ -1,93 +1,52 @@
 module.exports = {
-  "parser": "babel-eslint",
-  "env": {
-    "browser": true,
-    "commonjs": true,
-    "es6": true,
-    "node": true
+  parser: 'babel-eslint',
+  env: {
+    browser: true,
+    node: true,
+    es6: true,
+    jest: true,
   },
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true,
-      "modules": true,
-      "experimentalObjectRestSpread": true
+  settings: {
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
     },
-    "sourceType": "module"
   },
-  "plugins": [
-    "react"
+  extends: [
+    'airbnb',
+    'plugin:prettier/recommended', // Enables eslint-plugin-prettier and eslint-config-prettier. This will display prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
+    'prettier/react',
+    'prettier/standard',
   ],
-  "extends": "airbnb",
-  "rules": {
-    "semi": ["warn", "always"],
-    "eqeqeq": "warn",
-    "indent": ["warn", 2, { "SwitchCase": 1 }],
-    "no-console": ["warn", { "allow": ["warn", "error"] }],
-    "no-const-assign": "warn",
-    "no-this-before-super": "warn",
-    "no-undef": "warn",
-    "no-unreachable": "warn",
-    "no-else-return": "warn",
-    "no-unused-vars": "warn",
-    "constructor-super": "warn",
-    "array-bracket-spacing": ["warn", "never"],
-    "block-spacing": "warn",
-    "brace-style": "warn",
-    "valid-typeof": "warn",
-    "jsx-quotes": ["error", "prefer-single"],
-    "no-var": "warn",
-    "no-duplicate-imports": "warn",
-    "no-unused-expressions": "warn",
-    "class-methods-use-this": ["error", {
-      "exceptMethods": [
-        "render",
-        "getInitialState",
-        "getDefaultProps",
-        "componentWillMount",
-        "componentDidMount",
-        "componentWillReceiveProps",
-        "shouldComponentUpdate",
-        "componentWillUpdate",
-        "componentDidUpdate",
-        "componentWillUnmount"
-      ]
-    }],
-    "react/display-name": 1,
-    "react/jsx-boolean-value": 1,
-    "react/jsx-closing-bracket-location": 1,
-    "react/jsx-curly-spacing": 1,
-    "react/jsx-handler-names": 0,
-    "react/jsx-indent-props": 1,
-    "react/jsx-key": 1,
-    "react/jsx-max-props-per-line": 1,
-    "react/jsx-no-bind": 1,
-    "react/jsx-no-duplicate-props": 1,
-    "react/jsx-no-literals": 1,
-    "react/jsx-no-undef": 1,
-    "react/jsx-pascal-case": 1,
-    "react/jsx-sort-props": [1, {
-      "callbacksLast": true,
-      "ignoreCase": false,
-      "shorthandFirst": true
-    }],
-    "react/jsx-uses-react": 1,
-    "react/jsx-uses-vars": 1,
-    "react/no-danger": 0,
-    "react/no-did-mount-set-state": 1,
-    "react/no-did-update-set-state": 1,
-    "react/no-direct-mutation-state": 1,
-    "react/no-multi-comp": 1,
-    "react/no-set-state": 0,
-    "react/no-unknown-property": 1,
-    "react/no-unused-prop-types":1,
-    "react/prefer-es6-class": 1,
-    "react/prop-types": 1,
-    "react/react-in-jsx-scope": 1,
-    "react/require-extension": 0,
-    "react/self-closing-comp": 1,
-    "react/sort-comp": 1,
-    "react/jsx-wrap-multilines": 1,
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "react/forbid-prop-types":1
-  }
+  plugins: ['prettier'],
+  rules: {
+    'jsx-a11y/href-no-hash': 'off',
+    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
+    'react/prefer-stateless-function': [1, { ignorePureComponents: true }],
+    'function-paren-newline': ['error', 'consistent'],
+    'arrow-body-style': [1, 'as-needed'],
+    'no-unused-vars': ['error', { vars: 'all', args: 'all', ignoreRestSiblings: false }],
+    'prefer-destructuring': ['error', { object: true, array: true }],
+    'react/forbid-prop-types': ['error', { forbid: [] }],
+    'react/prop-types': 1,
+    'max-len': [
+      2,
+      150,
+      2,
+      {
+        ignoreUrls: true,
+        ignoreComments: false,
+        tabWidth: 2,
+      },
+    ],
+    'no-underscore-dangle': ['error', { allow: ['__PRELOADED_STATE__'] }],
+    'no-unused-expressions': 1,
+    'react/no-unused-prop-types': 1,
+    'no-unneeded-ternary': 2,
+    'import/prefer-default-export': 1,
+    'react/destructuring-assignment': [1, 'always'],
+    'linebreak-style': 1,
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+  },
 };

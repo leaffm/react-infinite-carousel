@@ -1,9 +1,7 @@
-import React, {
-  Component,
-  Children,
-} from 'react';
+import React, { Component, Children } from 'react';
 import PropTypes from 'prop-types';
 import { media } from 'react-responsive-mixin';
+import uniqid from 'uniqid';
 import {
   getElementWidth,
   getSwipeDirection,
@@ -16,70 +14,6 @@ import InfiniteCarouselDots from './components/InfiniteCarouselDots';
 import styles from './components/InfiniteCarousel.css';
 
 class InfiniteCarousel extends Component {
-  static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.node),
-      PropTypes.node,
-    ]),
-    arrows: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
-    dots: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
-    paging: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
-    pagingSeparator: PropTypes.string,
-    lazyLoad: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
-    swipe: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
-    draggable: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
-    animationDuration: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
-    slidesToShow: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
-    slidesToScroll: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
-    slidesSpacing: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
-    autoCycle: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
-    cycleInterval: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
-    pauseOnHover: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
-    responsive: PropTypes.bool,
-    breakpoints: PropTypes.arrayOf(PropTypes.object),
-    placeholderImageSrc: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
-    nextArrow: PropTypes.element, // eslint-disable-line react/no-unused-prop-types
-    prevArrow: PropTypes.element, // eslint-disable-line react/no-unused-prop-types
-    scrollOnDevice: PropTypes.bool,
-    showSides: PropTypes.bool,
-    sidesOpacity: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
-    sideSize: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
-    incrementalSides: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types,
-    onSlideChange: PropTypes.func,
-    onNextClick: PropTypes.func,
-    onPreviousClick: PropTypes.func,
-  };
-  static defaultProps = {
-    children: [],
-    arrows: true,
-    dots: false,
-    paging: false,
-    lazyLoad: false,
-    swipe: true,
-    draggable: false,
-    animationDuration: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    slidesSpacing: 10,
-    autoCycle: false,
-    cycleInterval: 5000,
-    pauseOnHover: true,
-    responsive: true,
-    breakpoints: [],
-    placeholderImageSrc: '',
-    pagingSeparator: '/',
-    nextArrow: null,
-    prevArrow: null,
-    scrollOnDevice: false,
-    showSides: false,
-    sidesOpacity: 1,
-    sideSize: 0.5,
-    incrementalSides: false,
-    onSlideChange: undefined,
-    onNextClick: undefined,
-    onPreviousClick: undefined,
-  };
-
   constructor(props) {
     super(props);
 
@@ -138,15 +72,20 @@ class InfiniteCarousel extends Component {
     } else {
       window.detachEvent('onresize', this.onWindowResized);
     }
-    if (this.state.autoCycleTimer) {
-      clearInterval(this.state.autoCycleTimer);
+    const { autoCycleTimer } = this.state;
+    if (autoCycleTimer) {
+      clearInterval(autoCycleTimer);
     }
   }
 
-  setupBreakpointSettings = (breakpointsSettings) => {
+  setupBreakpointSettings = breakpointsSettings => {
+    const { children: propChildren, scrollOnDevice: propScrollOnDevice } = this.props;
+    const { scrollOnDeviceProps: stateScrollOnDeviceProps } = this.state;
     const breakpoints = breakpointsSettings.map(element => element.breakpoint);
     const settings = {};
-    breakpointsSettings.forEach((element) => { settings[element.breakpoint] = element.settings; });
+    breakpointsSettings.forEach(element => {
+      settings[element.breakpoint] = element.settings;
+    });
     if (breakpoints.length > 0) {
       breakpoints.sort(sortNumber);
       // Register responsive media queries in settings
@@ -165,22 +104,24 @@ class InfiniteCarousel extends Component {
         const query = { minWidth: lowerBreakpoint, maxWidth: higherBreakpoint };
 
         media(query, () => {
-          const scrollOnDevice = this.props.scrollOnDevice && isTouchDevice();
-          const scrollOnDeviceProps = scrollOnDevice ? this.state.scrollOnDeviceProps : {};
-          const newSettings = Object.assign(
-            {},
-            this.defaultProps,
-            this.props,
-            settings[element],
-            scrollOnDeviceProps,
+          const scrollOnDevice = propScrollOnDevice && isTouchDevice();
+          const scrollOnDeviceProps = scrollOnDevice ? stateScrollOnDeviceProps : {};
+          const newSettings = {
+            ...this.defaultProps,
+            ...this.props,
+            ...settings[element],
+            ...scrollOnDeviceProps,
+          };
+          const children = this.getChildrenList(propChildren, newSettings.slidesToShow);
+          this.setState(
+            {
+              settings: newSettings,
+              children,
+              lowerBreakpoint,
+              higherBreakpoint,
+            },
+            this.setDimensions
           );
-          const children = this.getChildrenList(this.props.children, newSettings.slidesToShow);
-          this.setState({
-            settings: newSettings,
-            children,
-            lowerBreakpoint,
-            higherBreakpoint,
-          }, this.setDimensions);
         });
       });
 
@@ -188,22 +129,27 @@ class InfiniteCarousel extends Component {
       breakpoints.reverse();
       const query = { minWidth: breakpoints[0] };
       media(query, () => {
-        const scrollOnDevice = this.props.scrollOnDevice && isTouchDevice();
-        const scrollOnDeviceProps = scrollOnDevice ? this.state.scrollOnDeviceProps : {};
-        const newSettings = Object.assign({}, this.defaultProps, this.props, scrollOnDeviceProps);
-        const children = this.getChildrenList(this.props.children, newSettings.slidesToShow);
-        this.setState({
-          settings: newSettings,
-          children,
-          lowerBreakpoint: undefined,
-          higherBreakpoint: undefined,
-        }, this.setDimensions);
+        const scrollOnDevice = propScrollOnDevice && isTouchDevice();
+        const scrollOnDeviceProps = scrollOnDevice ? stateScrollOnDeviceProps : {};
+        const newSettings = { ...this.defaultProps, ...this.props, ...scrollOnDeviceProps };
+        const children = this.getChildrenList(propChildren, newSettings.slidesToShow);
+        this.setState(
+          {
+            settings: newSettings,
+            children,
+            lowerBreakpoint: undefined,
+            higherBreakpoint: undefined,
+          },
+          this.setDimensions
+        );
       });
     }
   };
 
   getSideSize = (lowerBreakpoint, higherBreakpoint, currentScreenWidth) => {
-    const { incrementalSides } = this.state.settings;
+    const {
+      settings: { incrementalSides, sideSize },
+    } = this.state;
 
     if (lowerBreakpoint !== undefined && higherBreakpoint !== undefined && incrementalSides) {
       const maxPoint = higherBreakpoint - lowerBreakpoint;
@@ -213,22 +159,23 @@ class InfiniteCarousel extends Component {
       return sideSizePercetange / 100;
     }
 
-    return this.state.settings.sideSize;
+    return sideSize;
   };
 
   setDimensions = () => {
-    const { settings, lowerBreakpoint, higherBreakpoint } = this.state;
-    const scrollOnDevice = this.props.scrollOnDevice && isTouchDevice();
+    const { settings, lowerBreakpoint, higherBreakpoint, children, currentIndex } = this.state;
+    const { children: propChildren, scrollOnDevice: propScrollOnDevice } = this.props;
+    const scrollOnDevice = propScrollOnDevice && isTouchDevice();
     const currentScreenWidth = getScreenWidth();
     const sideSize = this.getSideSize(lowerBreakpoint, higherBreakpoint, currentScreenWidth);
-    const childrenCount = Children.count(this.props.children);
-    const slidesCount = scrollOnDevice ? childrenCount : Children.count(this.state.children);
+    const childrenCount = Children.count(propChildren);
+    const slidesCount = scrollOnDevice ? childrenCount : Children.count(children);
     const frameWidth = getElementWidth(this.frame);
     const { showSides } = this.props;
-    const slidesToShow = showSides ? settings.slidesToShow + (sideSize * 2) : settings.slidesToShow;
-    const slidesWidth = (frameWidth / slidesToShow) - (settings.slidesSpacing * 2);
-    const childrenLength = this.props.children.length;
-    const activePage = Math.ceil(this.state.currentIndex / settings.slidesToShow);
+    const slidesToShow = showSides ? settings.slidesToShow + sideSize * 2 : settings.slidesToShow;
+    const slidesWidth = frameWidth / slidesToShow - settings.slidesSpacing * 2;
+    const childrenLength = propChildren.length;
+    const activePage = Math.ceil(currentIndex / settings.slidesToShow);
     const countPages = Math.ceil(childrenLength / settings.slidesToShow);
     const slidePages = childrenLength > settings.slidesToShow ? countPages : 1;
     const singlePage = slidePages <= 1;
@@ -236,11 +183,12 @@ class InfiniteCarousel extends Component {
     let lazyLoadedList;
     let visibleSlideList;
     if (singlePage || scrollOnDevice) {
-      lazyLoadedList = this.state.children.map((child, index) => index);
-      visibleSlideList = this.state.children.map((child, index) => index);
+      // jshint unused:true
+      lazyLoadedList = children.map((_child, index) => index); // eslint-disable-line no-unused-vars
+      visibleSlideList = [].concat(lazyLoadedList);
     } else {
-      lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, this.state.currentIndex);
-      visibleSlideList = this.getVisibleIndexes(this.props.children, this.state.currentIndex);
+      lazyLoadedList = this.getLazyLoadedIndexes(propChildren, currentIndex);
+      visibleSlideList = this.getVisibleIndexes(propChildren, currentIndex);
     }
 
     this.setState({
@@ -265,7 +213,7 @@ class InfiniteCarousel extends Component {
 
     start = children.length + settings.slidesToShow + showSidesSlide;
     if (currentIndex === 0) {
-      limit = (start + settings.slidesToShow) - 1;
+      limit = start + settings.slidesToShow - 1;
       for (let index = start; index <= limit; index += 1) {
         visibleIndexes.push(index);
       }
@@ -275,14 +223,14 @@ class InfiniteCarousel extends Component {
     const isAtLastPage = currentIndex === children.length - settings.slidesToShow;
 
     if (isAtLastPage) {
-      limit = (start + settings.slidesToShow) - 1;
+      limit = start + settings.slidesToShow - 1;
       for (let index = start; index <= limit; index += 1) {
         visibleIndexes.push(index);
       }
     }
 
-    start = currentIndex + this.state.settings.slidesToShow + showSidesSlide;
-    limit = start + (this.state.settings.slidesToShow - 1);
+    start = currentIndex + settings.slidesToShow + showSidesSlide;
+    limit = start + (settings.slidesToShow - 1);
     for (let index = start; index <= limit; index += 1) {
       visibleIndexes.push(index);
     }
@@ -296,65 +244,67 @@ class InfiniteCarousel extends Component {
     let limit;
     const { settings } = this.state;
     const showSidesSlide = settings.showSides ? 1 : 0;
+    const newLazyLoadedList = [].concat(lazyLoadedList);
 
     start = children.length + settings.slidesToShow + showSidesSlide;
-    if (currentIndex === 0 && this.state.lazyLoadedList.indexOf(start) < 0) {
-      limit = (start + settings.slidesToShow + showSidesSlide) - 1;
+    if (currentIndex === 0 && lazyLoadedList.indexOf(start) < 0) {
+      limit = start + settings.slidesToShow + showSidesSlide - 1;
       for (let index = start; index <= limit; index += 1) {
-        lazyLoadedList.push(index);
+        newLazyLoadedList.push(index);
       }
     }
 
     start = 0;
     const isAtLastPage = currentIndex === children.length - settings.slidesToShow;
-    const notLazyLoaded = lazyLoadedList.indexOf(start) < 0;
+    const notLazyLoaded = newLazyLoadedList.indexOf(start) < 0;
 
     if (isAtLastPage && notLazyLoaded) {
-      limit = (start + settings.slidesToShow + showSidesSlide) - 1;
+      limit = start + settings.slidesToShow + showSidesSlide - 1;
       for (let index = start; index <= limit; index += 1) {
-        lazyLoadedList.push(index);
+        newLazyLoadedList.push(index);
       }
     }
 
     start = currentIndex + settings.slidesToShow + showSidesSlide;
     limit = start + (settings.slidesToShow - 1);
 
-    if (this.state.settings.showSides) {
+    if (settings.showSides) {
       start -= 1;
       limit += 1;
     }
 
     for (let index = start; index <= limit; index += 1) {
-      if (this.state.lazyLoadedList.indexOf(index) < 0) {
-        lazyLoadedList.push(index);
+      if (lazyLoadedList.indexOf(index) < 0) {
+        newLazyLoadedList.push(index);
       }
     }
 
-    return lazyLoadedList;
+    return newLazyLoadedList;
   };
 
   getChildrenList = (children, slidesToShow) => {
+    const { scrollOnDevice, showSides } = this.props;
     if (!Array.isArray(children)) {
       return [children];
     }
 
-    if (this.props.scrollOnDevice && isTouchDevice()) {
+    if (scrollOnDevice && isTouchDevice()) {
       return children;
     }
 
-    if (children.length > slidesToShow && this.props.showSides) {
+    if (children.length > slidesToShow && showSides) {
       return [
-        ...(children.slice(children.length - slidesToShow - 1, children.length)),
+        ...children.slice(children.length - slidesToShow - 1, children.length),
         ...children,
-        ...(children.slice(0, slidesToShow + 1)),
+        ...children.slice(0, slidesToShow + 1),
       ];
     }
 
     if (children.length > slidesToShow) {
       return [
-        ...(children.slice(children.length - slidesToShow, children.length)),
+        ...children.slice(children.length - slidesToShow, children.length),
         ...children,
-        ...(children.slice(0, slidesToShow)),
+        ...children.slice(0, slidesToShow),
       ];
     }
 
@@ -362,21 +312,22 @@ class InfiniteCarousel extends Component {
   };
 
   getTargetIndex = (index, slidesToScroll) => {
+    const { childrenCount, currentIndex } = this.state;
     let targetIndex = index;
-    const childrenReminder = this.state.childrenCount % slidesToScroll;
+    const childrenReminder = childrenCount % slidesToScroll;
     if (index < 0) {
-      if (this.state.currentIndex === 0) {
-        targetIndex = this.state.childrenCount - slidesToScroll;
+      if (currentIndex === 0) {
+        targetIndex = childrenCount - slidesToScroll;
       } else {
         targetIndex = 0;
       }
-    } else if (index >= this.state.childrenCount) {
+    } else if (index >= childrenCount) {
       if (childrenReminder !== 0) {
         targetIndex = 0;
       } else {
-        targetIndex = index - this.state.childrenCount;
+        targetIndex = index - childrenCount;
       }
-    } else if (childrenReminder !== 0 && index === (this.state.childrenCount - childrenReminder)) {
+    } else if (childrenReminder !== 0 && index === childrenCount - childrenReminder) {
       targetIndex = index - (slidesToScroll - childrenReminder);
     } else {
       targetIndex = index;
@@ -385,23 +336,24 @@ class InfiniteCarousel extends Component {
     return targetIndex;
   };
 
-  onDotClick = (event) => {
+  onDotClick = event => {
     event.preventDefault();
-    if (this.state.animating) {
+    const { settings, animating, autoCycleTimer } = this.state;
+    const { slidesToShow, autoCycle } = settings;
+    if (animating) {
       return;
     }
-    if (this.state.settings.autoCycle && this.state.autoCycleTimer) {
-      clearInterval(this.state.autoCycleTimer);
+    if (autoCycle && autoCycleTimer) {
+      clearInterval(autoCycleTimer);
       this.setState({
         autoCycleTimer: null,
       });
     }
-    const { settings } = this.state;
-    const { slidesToShow } = settings;
+
     const targetIndex = event.target.parentElement.getAttribute('data-index');
     const currentIndex = this.getTargetIndex(targetIndex * slidesToShow, slidesToShow);
     this.handleTrack(targetIndex * slidesToShow, currentIndex);
-    if (this.state.settings.autoCycle) {
+    if (settings.autoCycle) {
       this.playAutoCycle();
     }
   };
@@ -411,52 +363,72 @@ class InfiniteCarousel extends Component {
   };
 
   onMouseEnter = () => {
-    if (this.state.settings.autoCycle && this.state.settings.pauseOnHover) {
+    const {
+      settings: { autoCycle, pauseOnHover },
+    } = this.state;
+    if (autoCycle && pauseOnHover) {
       this.pauseAutoCycle();
     }
   };
 
   onMouseOver = () => {
-    if (this.state.settings.autoCycle && this.state.settings.pauseOnHover) {
+    const {
+      settings: { autoCycle, pauseOnHover },
+    } = this.state;
+    if (autoCycle && pauseOnHover) {
       this.pauseAutoCycle();
     }
   };
 
   onMouseLeave = () => {
-    if (this.state.settings.autoCycle && this.state.settings.pauseOnHover) {
+    const {
+      settings: { autoCycle, pauseOnHover },
+    } = this.state;
+    if (autoCycle && pauseOnHover) {
       this.playAutoCycle();
     }
   };
 
-  onSwipeStart = (e) => {
-    if ((this.state.settings.swipe === false) || ('ontouchend' in document && this.state.settings.swipe === false)) {
-      return;
+  onSwipeStart = e => {
+    const {
+      settings: { swipe, draggable },
+    } = this.state;
+    const isSwipable = swipe === true;
+    const isDraggable = draggable && e.type.indexOf('mouse') === -1;
+    /* if (
+      this.state.settings.swipe === false ||
+      ('ontouchend' in document && this.state.settings.swipe === false)
+    ) {
+      return null;
     } else if (this.state.settings.draggable === false && e.type.indexOf('mouse') !== -1) {
-      return;
+      return null;
+    } */
+
+    if (isSwipable && isDraggable) {
+      const startX = e.touches !== undefined ? e.touches[0].pageX : e.clientX;
+      const startY = e.touches !== undefined ? e.touches[0].pageY : e.clientY;
+
+      this.setState({
+        dragging: true,
+        touchObject: {
+          startX,
+          startY,
+        },
+      });
     }
-
-    const startX = (e.touches !== undefined) ? e.touches[0].pageX : e.clientX;
-    const startY = (e.touches !== undefined) ? e.touches[0].pageY : e.clientY;
-
-    this.setState({
-      dragging: true,
-      touchObject: {
-        startX,
-        startY,
-      },
-    });
   };
 
-  onSwipeMove = (e) => {
-    if (!this.state.dragging) {
+  onSwipeMove = e => {
+    const { dragging, animating } = this.state;
+    if (!dragging) {
       e.preventDefault();
       return;
     }
-    if (this.state.animating) {
+    if (animating) {
       return;
     }
-    const curX = (e.touches !== undefined) ? e.touches[0].pageX : e.clientX;
-    const curY = (e.touches !== undefined) ? e.touches[0].pageY : e.clientY;
+    const curX = e.touches !== undefined ? e.touches[0].pageX : e.clientX;
+    const curY = e.touches !== undefined ? e.touches[0].pageY : e.clientY;
     const { touchObject } = this.state;
     const direction = getSwipeDirection(touchObject.startX, curX, touchObject.startY, curY);
 
@@ -479,33 +451,33 @@ class InfiniteCarousel extends Component {
   };
 
   onSwipeEnd = () => {
-    const swipeLength = this.state.touchObject.length;
-    if (swipeLength !== 0 && swipeLength > this.state.slidesWidth / 2) {
-      if (this.state.settings.autoCycle && this.state.autoCycleTimer) {
-        clearInterval(this.state.autoCycleTimer);
+    const { touchObject, slidesWidth, autoCycleTimer, settings, currentIndex } = this.state;
+    const swipeLength = touchObject.length;
+    if (swipeLength !== 0 && swipeLength > slidesWidth / 2) {
+      if (settings.autoCycle && autoCycleTimer) {
+        clearInterval(autoCycleTimer);
         this.setState({
           autoCycleTimer: null,
         });
       }
 
-      const { settings } = this.state;
       let targetIndex;
-      let currentIndex;
-      if (this.state.touchObject.direction === 1) {
+      let nextCurrentIndex;
+      if (touchObject.direction === 1) {
         // Next
-        targetIndex = this.state.currentIndex + settings.slidesToScroll;
-        currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
+        targetIndex = currentIndex + settings.slidesToScroll;
+        nextCurrentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
       } else {
         // Previous
-        targetIndex = this.state.currentIndex - settings.slidesToScroll;
-        currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
-        if (targetIndex < 0 && this.state.currentIndex !== 0) {
+        targetIndex = currentIndex - settings.slidesToScroll;
+        nextCurrentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
+        if (targetIndex < 0 && currentIndex !== 0) {
           targetIndex = 0;
         }
       }
-      this.handleTrack(targetIndex, currentIndex);
+      this.handleTrack(targetIndex, nextCurrentIndex);
 
-      if (this.state.settings.autoCycle) {
+      if (settings.autoCycle) {
         this.playAutoCycle();
       }
     } else {
@@ -523,32 +495,43 @@ class InfiniteCarousel extends Component {
               direction: -1,
             },
           });
-        }, this.state.settings.animationDuration);
+        }, settings.animationDuration);
       };
 
-      this.setState({
-        animating: true,
-        touchObject: {
-          direction: this.state.touchObject.direction * -1,
+      this.setState(
+        {
+          animating: true,
+          touchObject: {
+            direction: touchObject.direction * -1,
+          },
         },
-      }, callback);
+        callback
+      );
     }
   };
 
   getTrackStyles = () => {
     const { settings } = this.state;
-    const { touchObject } = this.state;
-    let trackWidth = (this.state.slidesWidth + (settings.slidesSpacing * 2));
-    trackWidth *= (this.state.slidesCount + (settings.slidesToShow * 2));
-    const totalSlideWidth = this.state.slidesWidth + (settings.slidesSpacing * 2);
+    const {
+      touchObject,
+      singlePage,
+      sideSize,
+      animating,
+      slidesWidth,
+      slidesCount,
+      currentIndex,
+    } = this.state;
+    let trackWidth = slidesWidth + settings.slidesSpacing * 2;
+    trackWidth *= slidesCount + settings.slidesToShow * 2;
+    const totalSlideWidth = slidesWidth + settings.slidesSpacing * 2;
     const showSidesSlide = settings.showSides ? 1 : 0;
     const initialTrackPostion = totalSlideWidth * (settings.slidesToShow + showSidesSlide);
-    const transition = this.state.animating ? `transform ${settings.animationDuration}ms ease` : '';
+    const transition = animating ? `transform ${settings.animationDuration}ms ease` : '';
     const hasTouchOffset = settings.swipe && touchObject.length;
     const touchOffset = hasTouchOffset ? touchObject.length * touchObject.direction : 0;
-    const slidePosition = totalSlideWidth * this.state.currentIndex;
+    const slidePosition = totalSlideWidth * currentIndex;
     let trackPosition = initialTrackPostion + slidePosition + touchOffset;
-    const sideWidth = totalSlideWidth * this.state.sideSize;
+    const sideWidth = totalSlideWidth * sideSize;
 
     if (settings.showSides) {
       trackPosition -= sideWidth;
@@ -557,14 +540,14 @@ class InfiniteCarousel extends Component {
     return {
       position: 'relative',
       display: 'block',
-      width: !this.state.singlePage ? trackWidth : '100%',
+      width: !singlePage ? trackWidth : '100%',
       height: 'auto',
       padding: 0,
       transition,
-      transform: !this.state.singlePage ? `translate(${-trackPosition}px, 0px)` : 'none',
+      transform: !singlePage ? `translate(${-trackPosition}px, 0px)` : 'none',
       boxSizing: 'border-box',
       MozBoxSizing: 'border-box',
-      marginLeft: this.state.singlePage && settings.showSides ? `${sideWidth}px` : '0px',
+      marginLeft: singlePage && settings.showSides ? `${sideWidth}px` : '0px',
     };
   };
 
@@ -579,12 +562,13 @@ class InfiniteCarousel extends Component {
     MozBoxSizing: 'border-box',
   };
 
-  getSlideStyles = (isVisible) => {
-    const { slidesWidth } = this.state;
-    const isScrollTouch = this.props.scrollOnDevice && isTouchDevice();
+  getSlideStyles = isVisible => {
+    const { slidesWidth, settings } = this.state;
+    const { scrollOnDevice } = this.props;
+    const isScrollTouch = scrollOnDevice && isTouchDevice();
     const float = isScrollTouch ? 'none' : 'left';
     const display = 'inline-block';
-    const opacity = isVisible ? '1' : this.state.settings.sidesOpacity;
+    const opacity = isVisible ? '1' : settings.sidesOpacity;
 
     return {
       position: 'relative',
@@ -592,7 +576,7 @@ class InfiniteCarousel extends Component {
       display,
       width: !Number.isNaN(slidesWidth) ? slidesWidth : 1,
       height: 'auto',
-      margin: `0 ${this.state.settings.slidesSpacing}px`,
+      margin: `0 ${settings.slidesSpacing}px`,
       opacity,
     };
   };
@@ -606,7 +590,7 @@ class InfiniteCarousel extends Component {
         return (
           <li
             className={styles.InfiniteCarouselSlide}
-            key={index}
+            key={uniqid('slide-')}
             style={this.getSlideStyles(isVisible)}
           >
             {child}
@@ -616,24 +600,25 @@ class InfiniteCarousel extends Component {
       return (
         <li
           className={styles.InfiniteCarouselSlide}
-          key={index}
+          key={uniqid('slide-')}
           style={this.getSlideStyles(isVisible)}
         >
-          <img alt='placeholder' src={settings.placeholderImageSrc} />
+          <img alt="placeholder" src={settings.placeholderImageSrc} />
         </li>
       );
     });
 
   autoCycle = () => {
-    const { settings } = this.state;
-    const targetIndex = this.state.currentIndex + settings.slidesToScroll;
-    const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
-    this.handleTrack(targetIndex, currentIndex);
+    const { settings, currentIndex } = this.state;
+    const targetIndex = currentIndex + settings.slidesToScroll;
+    const nextCurrentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
+    this.handleTrack(targetIndex, nextCurrentIndex);
   };
 
   playAutoCycle = () => {
-    if (this.state.settings.autoCycle) {
-      const autoCycleTimer = setInterval(this.autoCycle, this.state.settings.cycleInterval);
+    const { settings } = this.state;
+    if (settings.autoCycle) {
+      const autoCycleTimer = setInterval(this.autoCycle, settings.cycleInterval);
       this.setState({
         autoCycleTimer,
       });
@@ -641,8 +626,9 @@ class InfiniteCarousel extends Component {
   };
 
   pauseAutoCycle = () => {
-    if (this.state.autoCycleTimer) {
-      clearInterval(this.state.autoCycleTimer);
+    const { autoCycleTimer } = this.state;
+    if (autoCycleTimer) {
+      clearInterval(autoCycleTimer);
       this.setState({
         autoCycleTimer: null,
       });
@@ -650,10 +636,11 @@ class InfiniteCarousel extends Component {
   };
 
   handleTrack = (targetIndex, currentIndex) => {
+    const { children, onSlideChange } = this.props;
     const { settings } = this.state;
     const activePage = Math.ceil(currentIndex / settings.slidesToShow);
-    const lazyLoadedList = this.getLazyLoadedIndexes(this.props.children, currentIndex);
-    const visibleSlideList = this.getVisibleIndexes(this.props.children, currentIndex);
+    const lazyLoadedList = this.getLazyLoadedIndexes(children, currentIndex);
+    const visibleSlideList = this.getVisibleIndexes(children, currentIndex);
 
     const callback = () => {
       setTimeout(() => {
@@ -675,152 +662,174 @@ class InfiniteCarousel extends Component {
     };
 
     if (targetIndex < 0) {
-      this.setState({
-        currentIndex: targetIndex,
-        activePage,
-        animating: true,
-        lazyLoadedList,
-        visibleSlideList,
-        touchObject: {
-          startX: 0,
-          startY: 0,
-          endX: 0,
-          endY: 0,
-          length: 0,
-          direction: -1,
+      this.setState(
+        {
+          currentIndex: targetIndex,
+          activePage,
+          animating: true,
+          lazyLoadedList,
+          visibleSlideList,
+          touchObject: {
+            startX: 0,
+            startY: 0,
+            endX: 0,
+            endY: 0,
+            length: 0,
+            direction: -1,
+          },
         },
-      }, callback);
-    } else if (targetIndex >= this.props.children.length) {
-      this.setState({
-        currentIndex: targetIndex,
-        activePage,
-        animating: true,
-        lazyLoadedList,
-        visibleSlideList,
-        touchObject: {
-          startX: 0,
-          startY: 0,
-          endX: 0,
-          endY: 0,
-          length: 0,
-          direction: -1,
+        callback
+      );
+    } else if (targetIndex >= children.length) {
+      this.setState(
+        {
+          currentIndex: targetIndex,
+          activePage,
+          animating: true,
+          lazyLoadedList,
+          visibleSlideList,
+          touchObject: {
+            startX: 0,
+            startY: 0,
+            endX: 0,
+            endY: 0,
+            length: 0,
+            direction: -1,
+          },
         },
-      }, callback);
+        callback
+      );
     } else {
-      this.setState({
-        currentIndex,
-        activePage,
-        animating: true,
-        lazyLoadedList,
-        visibleSlideList,
-        dragging: false,
-        touchObject: {
-          startX: 0,
-          startY: 0,
-          endX: 0,
-          endY: 0,
-          length: 0,
-          direction: -1,
+      this.setState(
+        {
+          currentIndex,
+          activePage,
+          animating: true,
+          lazyLoadedList,
+          visibleSlideList,
+          dragging: false,
+          touchObject: {
+            startX: 0,
+            startY: 0,
+            endX: 0,
+            endY: 0,
+            length: 0,
+            direction: -1,
+          },
         },
-      }, stopAnimation);
+        stopAnimation
+      );
     }
 
-    if (this.props.onSlideChange) {
-      this.props.onSlideChange(activePage);
+    if (onSlideChange) {
+      onSlideChange(activePage);
     }
   };
 
-  moveToNext = (event) => {
+  moveToNext = event => {
+    const { onNextClick } = this.props;
+    const { animating, settings, currentIndex, autoCycleTimer } = this.state;
     event.preventDefault();
-    if (this.props.onNextClick) {
-      this.props.onNextClick(event);
+    if (onNextClick) {
+      onNextClick(event);
     }
-    if (this.state.animating) {
+    if (animating) {
       return;
     }
-    if (this.state.settings.autoCycle && this.state.autoCycleTimer) {
-      clearInterval(this.state.autoCycleTimer);
+    if (settings.autoCycle && autoCycleTimer) {
+      clearInterval(autoCycleTimer);
       this.setState({
         autoCycleTimer: null,
       });
     }
-    const { settings } = this.state;
-    const targetIndex = this.state.currentIndex + settings.slidesToScroll;
-    const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
-    this.handleTrack(targetIndex, currentIndex);
-    if (this.state.settings.autoCycle) {
+
+    const targetIndex = currentIndex + settings.slidesToScroll;
+    const nextCurrentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
+    this.handleTrack(targetIndex, nextCurrentIndex);
+    if (settings.autoCycle) {
       this.playAutoCycle();
     }
   };
 
-  moveToPrevious = (event) => {
+  moveToPrevious = event => {
+    const { onPreviousClick } = this.props;
+    const { animating, settings, currentIndex, autoCycleTimer } = this.state;
     event.preventDefault();
-    if (this.props.onPreviousClick) {
-      this.props.onPreviousClick(event);
+    if (onPreviousClick) {
+      onPreviousClick(event);
     }
-    if (this.state.animating) {
+    if (animating) {
       return;
     }
-    if (this.state.settings.autoCycle && this.state.autoCycleTimer) {
-      clearInterval(this.state.autoCycleTimer);
+    if (settings.autoCycle && autoCycleTimer) {
+      clearInterval(autoCycleTimer);
       this.setState({
         autoCycleTimer: null,
       });
     }
-    const { settings } = this.state;
-    let targetIndex = this.state.currentIndex - settings.slidesToScroll;
-    const currentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
-    if (targetIndex < 0 && this.state.currentIndex !== 0) {
+
+    let targetIndex = currentIndex - settings.slidesToScroll;
+    const nextCurrentIndex = this.getTargetIndex(targetIndex, settings.slidesToScroll);
+    if (targetIndex < 0 && currentIndex !== 0) {
       targetIndex = 0;
     }
-    this.handleTrack(targetIndex, currentIndex);
-    if (this.state.settings.autoCycle) {
+    this.handleTrack(targetIndex, nextCurrentIndex);
+    if (settings.autoCycle) {
       this.playAutoCycle();
     }
   };
 
   init = () => {
-    const children = this.getChildrenList(this.props.children, this.props.slidesToShow);
+    const { children, slidesToShow, scrollOnDevice, responsive, breakpoints } = this.props;
+    const { scrollOnDeviceProps } = this.state;
+    const newChildren = this.getChildrenList(children, slidesToShow);
     let settings;
-    if (this.props.scrollOnDevice && isTouchDevice()) {
-      settings = Object.assign({}, this.defaultProps, this.props, this.state.scrollOnDeviceProps);
+    if (scrollOnDevice && isTouchDevice()) {
+      settings = {
+        ...this.defaultProps,
+        ...this.props,
+        ...scrollOnDeviceProps,
+      };
     } else {
-      settings = Object.assign({}, this.defaultProps, this.props);
+      settings = {
+        ...this.defaultProps,
+        ...this.props,
+      };
     }
 
-    this.setState({
-      children,
-      settings,
-    }, () => {
-      this.playAutoCycle();
-    });
+    this.setState(
+      {
+        children: newChildren,
+        settings,
+      },
+      () => {
+        this.playAutoCycle();
+      }
+    );
 
-    if (this.props.responsive) {
-      this.setupBreakpointSettings(this.props.breakpoints);
+    if (responsive) {
+      this.setupBreakpointSettings(breakpoints);
     }
   };
 
-  storeFrameRef = (f) => {
+  storeFrameRef = f => {
     if (f !== null) {
       this.frame = f;
     }
   };
 
   render() {
-    const scrollOnDevice = this.props.scrollOnDevice && isTouchDevice();
-    const { settings } = this.state;
+    const { scrollOnDevice, pagingSeparator } = this.props;
+    const hasScrollOnDevice = scrollOnDevice && isTouchDevice();
+    const { settings, singlePage, activePage, slidePages, dragging } = this.state;
     let prevArrow;
     let nextArrow;
     let dots;
 
-    if (settings.arrows && !this.state.singlePage && !scrollOnDevice) {
+    if (settings.arrows && !singlePage && !hasScrollOnDevice) {
       if (settings.prevArrow == null) {
         prevArrow = (
-          <InfiniteCarouselArrow
-            next={false}
-            styles={styles}
-            onClick={this.moveToPrevious}
-          />
+          <InfiniteCarouselArrow next={false} styles={styles} onClick={this.moveToPrevious} />
         );
       } else {
         const prevArrowProps = {
@@ -830,12 +839,7 @@ class InfiniteCarousel extends Component {
       }
 
       if (settings.nextArrow == null) {
-        nextArrow = (
-          <InfiniteCarouselArrow
-            styles={styles}
-            onClick={this.moveToNext}
-          />
-        );
+        nextArrow = <InfiniteCarouselArrow styles={styles} onClick={this.moveToNext} />;
       } else {
         const nextArrowProps = {
           onClick: this.moveToNext,
@@ -844,21 +848,21 @@ class InfiniteCarousel extends Component {
       }
     }
 
-    if (settings.dots && !this.state.singlePage && !scrollOnDevice) {
+    if (settings.dots && !singlePage && !hasScrollOnDevice) {
       dots = (
         <InfiniteCarouselDots
-          activePage={this.state.activePage}
-          numberOfDots={this.state.slidePages}
+          activePage={activePage}
+          numberOfDots={slidePages}
           styles={styles}
           onClick={this.onDotClick}
         />
       );
     }
 
-    if (settings.paging && !this.state.singlePage && !scrollOnDevice) {
+    if (settings.paging && !singlePage && !hasScrollOnDevice) {
       dots = (
         <span className={styles.InfiniteCarouselPaging}>
-          { `${this.state.activePage + 1} ${this.props.pagingSeparator} ${this.state.slidePages}` }
+          {`${activePage + 1} ${pagingSeparator} ${slidePages}`}
         </span>
       );
     }
@@ -868,15 +872,19 @@ class InfiniteCarousel extends Component {
     let trackStyles;
     let trackClassName;
 
-    if (this.props.scrollOnDevice && isTouchDevice()) {
-      trackStyles = Object.assign({}, this.getScrollTrackStyles);
+    if (scrollOnDevice && isTouchDevice()) {
+      trackStyles = {
+        ...this.getScrollTrackStyles,
+      };
       trackClassName = styles.InfiniteCarouselScrollTrack;
     } else {
-      trackStyles = this.getTrackStyles();
+      trackStyles = {
+        ...this.getTrackStyles(),
+      };
       trackClassName = '';
     }
 
-    const disableSwipeEvents = this.props.scrollOnDevice && isTouchDevice();
+    const disableSwipeEvents = scrollOnDevice && isTouchDevice();
 
     return (
       <div
@@ -887,20 +895,17 @@ class InfiniteCarousel extends Component {
         onMouseOver={this.onMouseOver}
       >
         {prevArrow}
-        <div
-          className={styles.InfiniteCarouselFrame}
-          ref={this.storeFrameRef}
-        >
+        <div className={styles.InfiniteCarouselFrame} ref={this.storeFrameRef}>
           <ul
             className={trackClassName}
             style={trackStyles}
             onMouseDown={!disableSwipeEvents ? this.onSwipeStart : null}
-            onMouseLeave={this.state.dragging || !disableSwipeEvents ? this.onSwipeEnd : null}
-            onMouseMove={this.state.dragging || !disableSwipeEvents ? this.onSwipeMove : null}
+            onMouseLeave={dragging || !disableSwipeEvents ? this.onSwipeEnd : null}
+            onMouseMove={dragging || !disableSwipeEvents ? this.onSwipeMove : null}
             onMouseUp={!disableSwipeEvents ? this.onSwipeEnd : null}
-            onTouchCancel={this.state.dragging || !disableSwipeEvents ? this.onSwipeEnd : null}
+            onTouchCancel={dragging || !disableSwipeEvents ? this.onSwipeEnd : null}
             onTouchEnd={!disableSwipeEvents ? this.onSwipeEnd : null}
-            onTouchMove={this.state.dragging || !disableSwipeEvents ? this.onSwipeMove : null}
+            onTouchMove={dragging || !disableSwipeEvents ? this.onSwipeMove : null}
             onTouchStart={!disableSwipeEvents ? this.onSwipeStart : null}
           >
             {formattedChildren}
@@ -912,5 +917,67 @@ class InfiniteCarousel extends Component {
     );
   }
 }
+
+InfiniteCarousel.propTypes = {
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
+  arrows: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
+  dots: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
+  paging: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
+  pagingSeparator: PropTypes.string,
+  lazyLoad: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
+  swipe: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
+  draggable: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
+  animationDuration: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
+  slidesToShow: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
+  slidesToScroll: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
+  slidesSpacing: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
+  autoCycle: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
+  cycleInterval: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
+  pauseOnHover: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
+  responsive: PropTypes.bool,
+  breakpoints: PropTypes.arrayOf(PropTypes.object),
+  placeholderImageSrc: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
+  nextArrow: PropTypes.element, // eslint-disable-line react/no-unused-prop-types
+  prevArrow: PropTypes.element, // eslint-disable-line react/no-unused-prop-types
+  scrollOnDevice: PropTypes.bool,
+  showSides: PropTypes.bool,
+  sidesOpacity: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
+  sideSize: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
+  incrementalSides: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types,
+  onSlideChange: PropTypes.func,
+  onNextClick: PropTypes.func,
+  onPreviousClick: PropTypes.func,
+};
+
+InfiniteCarousel.defaultProps = {
+  children: [],
+  arrows: true,
+  dots: false,
+  paging: false,
+  lazyLoad: false,
+  swipe: true,
+  draggable: false,
+  animationDuration: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  slidesSpacing: 10,
+  autoCycle: false,
+  cycleInterval: 5000,
+  pauseOnHover: true,
+  responsive: true,
+  breakpoints: [],
+  placeholderImageSrc: '',
+  pagingSeparator: '/',
+  nextArrow: null,
+  prevArrow: null,
+  scrollOnDevice: false,
+  showSides: false,
+  sidesOpacity: 1,
+  sideSize: 0.5,
+  incrementalSides: false,
+  onSlideChange: undefined,
+  onNextClick: undefined,
+  onPreviousClick: undefined,
+};
 
 export default InfiniteCarousel;

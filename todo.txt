@@ -1,0 +1,8 @@
+1- Server side compatible
+2- SEO
+3- update libs
+4- improve documentation
+5- remove warnings
+6- add testids
+7- add unit testing
+8- disability?

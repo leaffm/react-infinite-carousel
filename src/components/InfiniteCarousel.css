@@ -13,7 +13,7 @@
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
   overflow: -moz-scrollbars-none;
-  -webkit-box-sizing: border-box
+  -webkit-box-sizing: border-box;
 }
 
 .InfiniteCarouselScrollTrack::-webkit-scrollbar {
@@ -54,14 +54,14 @@
 
 .InfiniteCarouselDotIcon {
   display: block;
-  background-color: #E5E5E5;
+  background-color: #e5e5e5;
   width: 10px;
   height: 10px;
   border-radius: 50%;
 }
 
 .InfiniteCarouselDotActiveIcon {
-  background-color: #48799A;
+  background-color: #48799a;
 }
 
 .InfiniteCarouselArrow {
@@ -89,7 +89,7 @@
 .InfiniteCarouselArrowIcon {
   display: inline-block;
   padding: 10px;
-  border: solid #E5E5E5;
+  border: solid #e5e5e5;
   border-width: 0 5px 5px 0;
 }
 

@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styles from './InfiniteCarousel.css';
 
-function InfiniteCarouselArrow({ next, onClick, styles }) {
+function InfiniteCarouselArrow({ next, onClick }) {
   const arrowClassName = styles.InfiniteCarouselArrow;
   let typeClassName;
   if (next) {
@@ -22,10 +23,7 @@ function InfiniteCarouselArrow({ next, onClick, styles }) {
   const classNameIcon = `${iconClassName} ${iconTypeClassName}`;
 
   return (
-    <button
-      className={className}
-      onClick={onClick}
-    >
+    <button className={className} onClick={onClick} type="button">
       <i className={classNameIcon} />
     </button>
   );
@@ -34,7 +32,6 @@ function InfiniteCarouselArrow({ next, onClick, styles }) {
 InfiniteCarouselArrow.propTypes = {
   next: PropTypes.bool,
   onClick: PropTypes.func.isRequired,
-  styles: PropTypes.object.isRequired,
 };
 
 InfiniteCarouselArrow.defaultProps = {
