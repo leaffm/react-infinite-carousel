@@ -3,13 +3,14 @@
   "version": "1.2.2",
   "description": "React simple infinite carousel with lazy loading and responsive support",
   "scripts": {
-    "build": "WEBPACK_ENV=build webpack",
+    "build": "WEBPACK_ENV=build webpack --mode production",
     "start": "WEBPACK_ENV=dev webpack-dev-server --mode development",
-    "update:packages": "node wipe-dependencies.js && rm -rf node_modules && npm update --save-dev && npm update --save"
+    "update:packages": "node wipe-dependencies.js && rm -rf node_modules && npm update --save-dev && npm update --save",
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/leaffm/react-infinite-carousel.git"
+    "url": "https://github.com/leaffm/react-infinite-carousel.git"
   },
   "keywords": [
     "carousel",
@@ -35,6 +36,7 @@
     "@babel/preset-es2015": "*",
     "@babel/preset-react": "^7.7.4",
     "@babel/preset-stage-0": "*",
+    "@semantic-release/npm": "^5.3.4",
     "babel-eslint": "*",
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-class-properties": "*",
@@ -54,6 +56,7 @@
     "gm-base64": "*",
     "html-webpack-plugin": "^3.2.0",
     "prettier": "^1.19.1",
+    "semantic-release": "^15.13.31",
     "style-loader": "^1.0.0",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.41.3",
@@ -75,5 +78,9 @@
         "*.js"
       ]
     }
-  ]
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "tag": "latest"
+  }
 }
