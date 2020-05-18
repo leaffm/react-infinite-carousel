@@ -1,6 +1,6 @@
 {
   "name": "react-leaf-carousel",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "React simple infinite carousel with lazy loading and responsive support",
   "scripts": {
     "build": "WEBPACK_ENV=build webpack --mode production",
