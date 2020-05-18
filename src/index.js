@@ -48,7 +48,6 @@ class InfiniteCarousel extends Component {
       },
       lowerBreakpoint: undefined,
       higherBreakpoint: undefined,
-      isSetupIncomplete: true,
       slideUniqueIds: [],
     };
   }
@@ -118,7 +117,7 @@ class InfiniteCarousel extends Component {
             ...scrollOnDeviceProps,
           };
           const children = this.getChildrenList(propChildren, newSettings.slidesToShow);
-          const slideUniqueIds = children.map(undefined => uniqid('slide-'));
+          const slideUniqueIds = children.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
           this.setState(
             {
               settings: newSettings,
@@ -144,7 +143,7 @@ class InfiniteCarousel extends Component {
           ...scrollOnDeviceProps,
         };
         const children = this.getChildrenList(propChildren, newSettings.slidesToShow);
-        const slideUniqueIds = children.map(undefined => uniqid('slide-'));
+        const slideUniqueIds = children.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
         this.setState(
           {
             settings: newSettings,
@@ -406,29 +405,27 @@ class InfiniteCarousel extends Component {
     const {
       settings: { swipe, draggable },
     } = this.state;
-    const isSwipable = swipe === true;
-    const isDraggable = draggable && e.type.indexOf('mouse') === -1;
-    /* if (
-      this.state.settings.swipe === false ||
-      ('ontouchend' in document && this.state.settings.swipe === false)
-    ) {
-      return null;
-    } else if (this.state.settings.draggable === false && e.type.indexOf('mouse') !== -1) {
-      return null;
-    } */
 
-    if (isSwipable && isDraggable) {
-      const startX = e.touches !== undefined ? e.touches[0].pageX : e.clientX;
-      const startY = e.touches !== undefined ? e.touches[0].pageY : e.clientY;
-
-      this.setState({
-        dragging: true,
-        touchObject: {
-          startX,
-          startY,
-        },
-      });
+    if (swipe === false || ('ontouchend' in document && swipe === false)) {
+      return null;
     }
+
+    if (draggable === false && e.type.indexOf('mouse') !== -1) {
+      return null;
+    }
+
+    const startX = e.touches !== undefined ? e.touches[0].pageX : e.clientX;
+    const startY = e.touches !== undefined ? e.touches[0].pageY : e.clientY;
+
+    this.setState({
+      dragging: true,
+      touchObject: {
+        startX,
+        startY,
+      },
+    });
+
+    return true;
   };
 
   onSwipeMove = e => {
@@ -824,7 +821,7 @@ class InfiniteCarousel extends Component {
       const settings = this.getSettingsForScrollOnDevice();
       const { slidesToShow } = settings;
       const newChildren = this.getChildrenList(children, slidesToShow);
-      const slideUniqueIds = newChildren.map(undefined => uniqid('slide-'));
+      const slideUniqueIds = newChildren.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
       this.setState(
         {
           children: newChildren,
@@ -925,7 +922,18 @@ class InfiniteCarousel extends Component {
       >
         {prevArrow}
         <div className="InfiniteCarouselFrame" ref={this.storeFrameRef}>
-          <ul className={trackClassName} style={trackStyles}>
+          <ul
+            className={trackClassName}
+            style={trackStyles}
+            onMouseDown={!disableSwipeEvents ? this.onSwipeStart : null}
+            onMouseLeave={dragging || !disableSwipeEvents ? this.onSwipeEnd : null}
+            onMouseMove={dragging || !disableSwipeEvents ? this.onSwipeMove : null}
+            onMouseUp={!disableSwipeEvents ? this.onSwipeEnd : null}
+            onTouchCancel={dragging || !disableSwipeEvents ? this.onSwipeEnd : null}
+            onTouchEnd={!disableSwipeEvents ? this.onSwipeEnd : null}
+            onTouchMove={dragging || !disableSwipeEvents ? this.onSwipeMove : null}
+            onTouchStart={!disableSwipeEvents ? this.onSwipeStart : null}
+          >
             {formattedChildren}
           </ul>
         </div>
