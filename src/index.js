@@ -48,12 +48,13 @@ class InfiniteCarousel extends Component {
       },
       lowerBreakpoint: undefined,
       higherBreakpoint: undefined,
+      isSetupIncomplete: true,
+      slideUniqueIds: [],
     };
   }
 
   componentDidMount() {
     this.init();
-    this.setDimensions();
 
     if (!window) {
       return;
@@ -78,8 +79,12 @@ class InfiniteCarousel extends Component {
     }
   }
 
-  setupBreakpointSettings = breakpointsSettings => {
-    const { children: propChildren, scrollOnDevice: propScrollOnDevice } = this.props;
+  setupBreakpointSettings = () => {
+    const {
+      children: propChildren,
+      scrollOnDevice: propScrollOnDevice,
+      breakpoints: breakpointsSettings,
+    } = this.props;
     const { scrollOnDeviceProps: stateScrollOnDeviceProps } = this.state;
     const breakpoints = breakpointsSettings.map(element => element.breakpoint);
     const settings = {};
@@ -113,10 +118,12 @@ class InfiniteCarousel extends Component {
             ...scrollOnDeviceProps,
           };
           const children = this.getChildrenList(propChildren, newSettings.slidesToShow);
+          const slideUniqueIds = children.map(undefined => uniqid('slide-'));
           this.setState(
             {
               settings: newSettings,
               children,
+              slideUniqueIds,
               lowerBreakpoint,
               higherBreakpoint,
             },
@@ -131,12 +138,18 @@ class InfiniteCarousel extends Component {
       media(query, () => {
         const scrollOnDevice = propScrollOnDevice && isTouchDevice();
         const scrollOnDeviceProps = scrollOnDevice ? stateScrollOnDeviceProps : {};
-        const newSettings = { ...this.defaultProps, ...this.props, ...scrollOnDeviceProps };
+        const newSettings = {
+          ...this.defaultProps,
+          ...this.props,
+          ...scrollOnDeviceProps,
+        };
         const children = this.getChildrenList(propChildren, newSettings.slidesToShow);
+        const slideUniqueIds = children.map(undefined => uniqid('slide-'));
         this.setState(
           {
             settings: newSettings,
             children,
+            slideUniqueIds,
             lowerBreakpoint: undefined,
             higherBreakpoint: undefined,
           },
@@ -537,6 +550,8 @@ class InfiniteCarousel extends Component {
       trackPosition -= sideWidth;
     }
 
+    const transform = !singlePage ? `translate(${-trackPosition}px, 0px)` : 'none';
+
     return {
       position: 'relative',
       display: 'block',
@@ -544,7 +559,7 @@ class InfiniteCarousel extends Component {
       height: 'auto',
       padding: 0,
       transition,
-      transform: !singlePage ? `translate(${-trackPosition}px, 0px)` : 'none',
+      transform,
       boxSizing: 'border-box',
       MozBoxSizing: 'border-box',
       marginLeft: singlePage && settings.showSides ? `${sideWidth}px` : '0px',
@@ -583,14 +598,14 @@ class InfiniteCarousel extends Component {
 
   getFormatedChildren = (children, lazyLoadedList, visibleSlideList) =>
     Children.map(children, (child, index) => {
-      const { settings } = this.state;
+      const { settings, slideUniqueIds } = this.state;
       const isVisible = visibleSlideList.indexOf(index) >= 0;
 
       if (!settings.lazyLoad || lazyLoadedList.indexOf(index) >= 0) {
         return (
           <li
             className="InfiniteCarouselSlide"
-            key={uniqid('slide-')}
+            key={slideUniqueIds[index]}
             style={this.getSlideStyles(isVisible)}
           >
             {child}
@@ -601,7 +616,7 @@ class InfiniteCarousel extends Component {
       return (
         <li
           className="InfiniteCarouselSlide"
-          key={uniqid('slide-')}
+          key={slideUniqueIds[index]}
           style={this.getSlideStyles(isVisible)}
         >
           <noscript>{child}</noscript>
@@ -781,10 +796,9 @@ class InfiniteCarousel extends Component {
     }
   };
 
-  init = () => {
-    const { children, slidesToShow, scrollOnDevice, responsive, breakpoints } = this.props;
+  getSettingsForScrollOnDevice = () => {
+    const { scrollOnDevice } = this.props;
     const { scrollOnDeviceProps } = this.state;
-    const newChildren = this.getChildrenList(children, slidesToShow);
     let settings;
     if (scrollOnDevice && isTouchDevice()) {
       settings = {
@@ -798,19 +812,30 @@ class InfiniteCarousel extends Component {
         ...this.props,
       };
     }
+    return settings;
+  };
 
-    this.setState(
-      {
-        children: newChildren,
-        settings,
-      },
-      () => {
-        this.playAutoCycle();
-      }
-    );
-
+  init = () => {
+    const { responsive } = this.props;
     if (responsive) {
-      this.setupBreakpointSettings(breakpoints);
+      this.setupBreakpointSettings();
+    } else {
+      const { children } = this.props;
+      const settings = this.getSettingsForScrollOnDevice();
+      const { slidesToShow } = settings;
+      const newChildren = this.getChildrenList(children, slidesToShow);
+      const slideUniqueIds = newChildren.map(undefined => uniqid('slide-'));
+      this.setState(
+        {
+          children: newChildren,
+          slideUniqueIds,
+          settings,
+        },
+        () => {
+          this.setDimensions();
+          this.playAutoCycle();
+        }
+      );
     }
   };
 
@@ -900,18 +925,7 @@ class InfiniteCarousel extends Component {
       >
         {prevArrow}
         <div className="InfiniteCarouselFrame" ref={this.storeFrameRef}>
-          <ul
-            className={trackClassName}
-            style={trackStyles}
-            onMouseDown={!disableSwipeEvents ? this.onSwipeStart : null}
-            onMouseLeave={dragging || !disableSwipeEvents ? this.onSwipeEnd : null}
-            onMouseMove={dragging || !disableSwipeEvents ? this.onSwipeMove : null}
-            onMouseUp={!disableSwipeEvents ? this.onSwipeEnd : null}
-            onTouchCancel={dragging || !disableSwipeEvents ? this.onSwipeEnd : null}
-            onTouchEnd={!disableSwipeEvents ? this.onSwipeEnd : null}
-            onTouchMove={dragging || !disableSwipeEvents ? this.onSwipeMove : null}
-            onTouchStart={!disableSwipeEvents ? this.onSwipeStart : null}
-          >
+          <ul className={trackClassName} style={trackStyles}>
             {formattedChildren}
           </ul>
         </div>
