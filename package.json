@@ -6,7 +6,7 @@
     "build": "WEBPACK_ENV=build webpack --mode production",
     "start": "WEBPACK_ENV=dev webpack-dev-server --mode development",
     "update:packages": "node wipe-dependencies.js && rm -rf node_modules && npm update --save-dev && npm update --save",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release --no-ci"
   },
   "repository": {
     "type": "git",
