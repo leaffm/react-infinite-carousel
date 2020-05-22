@@ -813,8 +813,8 @@ class InfiniteCarousel extends Component {
   };
 
   init = () => {
-    const { responsive } = this.props;
-    if (responsive) {
+    const { breakpoints } = this.props;
+    if (breakpoints.length > 0) {
       this.setupBreakpointSettings();
     } else {
       const { children } = this.props;
@@ -961,7 +961,6 @@ InfiniteCarousel.propTypes = {
   autoCycle: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
   cycleInterval: PropTypes.number, // eslint-disable-line react/no-unused-prop-types
   pauseOnHover: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
-  responsive: PropTypes.bool,
   breakpoints: PropTypes.arrayOf(PropTypes.object),
   placeholderImageSrc: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
   nextArrow: PropTypes.element, // eslint-disable-line react/no-unused-prop-types
@@ -992,7 +991,6 @@ InfiniteCarousel.defaultProps = {
   autoCycle: false,
   cycleInterval: 5000,
   pauseOnHover: true,
-  responsive: true,
   breakpoints: [],
   placeholderImageSrc: '',
   pagingSeparator: '/',
