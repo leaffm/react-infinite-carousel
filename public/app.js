@@ -7,11 +7,11 @@ React.initializeTouchEvents && React.initializeTouchEvents(true); // eslint-disa
 ReactDOM.render(
   <InfiniteCarousel
     swipe
+    autoCycle
+    lazyLoad
     dots
-    lazyload
     paging
     showSides
-    responsive
     breakpoints={[
       {
         breakpoint: 768,

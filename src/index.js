@@ -203,17 +203,22 @@ class InfiniteCarousel extends Component {
       visibleSlideList = this.getVisibleIndexes(propChildren, currentIndex);
     }
 
-    this.setState({
-      activePage,
-      childrenCount,
-      slidesCount,
-      slidesWidth,
-      slidePages,
-      singlePage,
-      lazyLoadedList,
-      visibleSlideList,
-      sideSize,
-    });
+    this.setState(
+      {
+        activePage,
+        childrenCount,
+        slidesCount,
+        slidesWidth,
+        slidePages,
+        singlePage,
+        lazyLoadedList,
+        visibleSlideList,
+        sideSize,
+      },
+      () => {
+        this.playAutoCycle();
+      }
+    );
   };
 
   getVisibleIndexes = (children, currentIndex) => {
@@ -830,7 +835,6 @@ class InfiniteCarousel extends Component {
         },
         () => {
           this.setDimensions();
-          this.playAutoCycle();
         }
       );
     }
@@ -926,12 +930,12 @@ class InfiniteCarousel extends Component {
             className={trackClassName}
             style={trackStyles}
             onMouseDown={!disableSwipeEvents ? this.onSwipeStart : null}
-            onMouseLeave={dragging || !disableSwipeEvents ? this.onSwipeEnd : null}
-            onMouseMove={dragging || !disableSwipeEvents ? this.onSwipeMove : null}
+            onMouseLeave={dragging && !disableSwipeEvents ? this.onSwipeEnd : null}
+            onMouseMove={dragging && !disableSwipeEvents ? this.onSwipeMove : null}
             onMouseUp={!disableSwipeEvents ? this.onSwipeEnd : null}
-            onTouchCancel={dragging || !disableSwipeEvents ? this.onSwipeEnd : null}
+            onTouchCancel={dragging && !disableSwipeEvents ? this.onSwipeEnd : null}
             onTouchEnd={!disableSwipeEvents ? this.onSwipeEnd : null}
-            onTouchMove={dragging || !disableSwipeEvents ? this.onSwipeMove : null}
+            onTouchMove={dragging && !disableSwipeEvents ? this.onSwipeMove : null}
             onTouchStart={!disableSwipeEvents ? this.onSwipeStart : null}
           >
             {formattedChildren}
