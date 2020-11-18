@@ -56,7 +56,7 @@
     "gm-base64": "*",
     "html-webpack-plugin": "^3.2.0",
     "prettier": "^1.19.1",
-    "semantic-release": "^15.13.31",
+    "semantic-release": "^17.2.3",
     "style-loader": "^1.0.0",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.41.3",
