@@ -85,9 +85,9 @@ class InfiniteCarousel extends Component {
       breakpoints: breakpointsSettings,
     } = this.props;
     const { scrollOnDeviceProps: stateScrollOnDeviceProps } = this.state;
-    const breakpoints = breakpointsSettings.map(element => element.breakpoint);
+    const breakpoints = breakpointsSettings.map((element) => element.breakpoint);
     const settings = {};
-    breakpointsSettings.forEach(element => {
+    breakpointsSettings.forEach((element) => {
       settings[element.breakpoint] = element.settings;
     });
     if (breakpoints.length > 0) {
@@ -117,7 +117,7 @@ class InfiniteCarousel extends Component {
             ...scrollOnDeviceProps,
           };
           const children = this.getChildrenList(propChildren, newSettings.slidesToShow);
-          const slideUniqueIds = children.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
+          const slideUniqueIds = children.map((child) => uniqid('slide-')); // eslint-disable-line  no-unused-vars
           this.setState(
             {
               settings: newSettings,
@@ -143,7 +143,7 @@ class InfiniteCarousel extends Component {
           ...scrollOnDeviceProps,
         };
         const children = this.getChildrenList(propChildren, newSettings.slidesToShow);
-        const slideUniqueIds = children.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
+        const slideUniqueIds = children.map((child) => uniqid('slide-')); // eslint-disable-line  no-unused-vars
         this.setState(
           {
             settings: newSettings,
@@ -175,7 +175,8 @@ class InfiniteCarousel extends Component {
   };
 
   setDimensions = () => {
-    const { settings, lowerBreakpoint, higherBreakpoint, children, currentIndex } = this.state;
+    const { settings, lowerBreakpoint, higherBreakpoint, children, currentIndex, autoCycleTimer } =
+      this.state;
     const { children: propChildren, scrollOnDevice: propScrollOnDevice } = this.props;
     const scrollOnDevice = propScrollOnDevice && isTouchDevice();
     const currentScreenWidth = getScreenWidth();
@@ -203,6 +204,7 @@ class InfiniteCarousel extends Component {
       visibleSlideList = this.getVisibleIndexes(propChildren, currentIndex);
     }
 
+    clearInterval(autoCycleTimer);
     this.setState(
       {
         activePage,
@@ -214,6 +216,8 @@ class InfiniteCarousel extends Component {
         lazyLoadedList,
         visibleSlideList,
         sideSize,
+        // clear autocycle
+        autoCycleTimer: null,
       },
       () => {
         this.playAutoCycle();
@@ -353,7 +357,7 @@ class InfiniteCarousel extends Component {
     return targetIndex;
   };
 
-  onDotClick = event => {
+  onDotClick = (event) => {
     event.preventDefault();
     const { settings, animating, autoCycleTimer } = this.state;
     const { slidesToShow, autoCycle } = settings;
@@ -406,7 +410,7 @@ class InfiniteCarousel extends Component {
     }
   };
 
-  onSwipeStart = e => {
+  onSwipeStart = (e) => {
     const {
       settings: { swipe, draggable },
     } = this.state;
@@ -433,7 +437,7 @@ class InfiniteCarousel extends Component {
     return true;
   };
 
-  onSwipeMove = e => {
+  onSwipeMove = (e) => {
     const { dragging, animating } = this.state;
     if (!dragging) {
       e.preventDefault();
@@ -527,15 +531,8 @@ class InfiniteCarousel extends Component {
 
   getTrackStyles = () => {
     const { settings } = this.state;
-    const {
-      touchObject,
-      singlePage,
-      sideSize,
-      animating,
-      slidesWidth,
-      slidesCount,
-      currentIndex,
-    } = this.state;
+    const { touchObject, singlePage, sideSize, animating, slidesWidth, slidesCount, currentIndex } =
+      this.state;
     let trackWidth = slidesWidth + settings.slidesSpacing * 2;
     trackWidth *= slidesCount + settings.slidesToShow * 2;
     const totalSlideWidth = slidesWidth + settings.slidesSpacing * 2;
@@ -579,7 +576,7 @@ class InfiniteCarousel extends Component {
     MozBoxSizing: 'border-box',
   };
 
-  getSlideStyles = isVisible => {
+  getSlideStyles = (isVisible) => {
     const { slidesWidth, settings } = this.state;
     const { scrollOnDevice } = this.props;
     const isScrollTouch = scrollOnDevice && isTouchDevice();
@@ -745,7 +742,7 @@ class InfiniteCarousel extends Component {
     }
   };
 
-  moveToNext = event => {
+  moveToNext = (event) => {
     const { onNextClick } = this.props;
     const { animating, settings, currentIndex, autoCycleTimer } = this.state;
     event.preventDefault();
@@ -770,7 +767,7 @@ class InfiniteCarousel extends Component {
     }
   };
 
-  moveToPrevious = event => {
+  moveToPrevious = (event) => {
     const { onPreviousClick } = this.props;
     const { animating, settings, currentIndex, autoCycleTimer } = this.state;
     event.preventDefault();
@@ -826,7 +823,7 @@ class InfiniteCarousel extends Component {
       const settings = this.getSettingsForScrollOnDevice();
       const { slidesToShow } = settings;
       const newChildren = this.getChildrenList(children, slidesToShow);
-      const slideUniqueIds = newChildren.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
+      const slideUniqueIds = newChildren.map((child) => uniqid('slide-')); // eslint-disable-line  no-unused-vars
       this.setState(
         {
           children: newChildren,
@@ -840,7 +837,7 @@ class InfiniteCarousel extends Component {
     }
   };
 
-  storeFrameRef = f => {
+  storeFrameRef = (f) => {
     if (f !== null) {
       this.frame = f;
     }

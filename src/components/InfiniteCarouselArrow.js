@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './InfiniteCarousel.css';
 
-function InfiniteCarouselArrow({ carouselName, next, onClick }) {
+const InfiniteCarouselArrow = function ({ carouselName, next, onClick }) {
   const arrowClassName = 'InfiniteCarouselArrow';
   let typeClassName;
   if (next) {
@@ -34,7 +34,7 @@ function InfiniteCarouselArrow({ carouselName, next, onClick }) {
       <i className={classNameIcon} />
     </button>
   );
-}
+};
 
 InfiniteCarouselArrow.propTypes = {
   carouselName: PropTypes.string.isRequired,
