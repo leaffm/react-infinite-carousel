@@ -66,13 +66,6 @@ class InfiniteCarousel extends Component {
     }
   }
 
-  componentDidUpdate(prevProps) {
-    const { children } = this.props;
-    if (prevProps.children !== children) {
-      this.generateChildrenFromProps();
-    }
-  }
-
   componentWillUnmount() {
     if (window.addEventListener) {
       window.removeEventListener('resize', this.onWindowResized);
@@ -829,7 +822,21 @@ class InfiniteCarousel extends Component {
     if (breakpoints.length > 0) {
       this.setupBreakpointSettings();
     } else {
-      this.generateChildrenFromProps();
+      const { children } = this.props;
+      const settings = this.getSettingsForScrollOnDevice();
+      const { slidesToShow } = settings;
+      const newChildren = this.getChildrenList(children, slidesToShow);
+      const slideUniqueIds = newChildren.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
+      this.setState(
+        {
+          children: newChildren,
+          slideUniqueIds,
+          settings,
+        },
+        () => {
+          this.setDimensions();
+        }
+      );
     }
   };
 
@@ -838,24 +845,6 @@ class InfiniteCarousel extends Component {
       this.frame = f;
     }
   };
-
-  generateChildrenFromProps() {
-    const { children } = this.props;
-    const settings = this.getSettingsForScrollOnDevice();
-    const { slidesToShow } = settings;
-    const newChildren = this.getChildrenList(children, slidesToShow);
-    const slideUniqueIds = newChildren.map(child => uniqid('slide-')); // eslint-disable-line  no-unused-vars
-    this.setState(
-      {
-        children: newChildren,
-        slideUniqueIds,
-        settings,
-      },
-      () => {
-        this.setDimensions();
-      }
-    );
-  }
 
   render() {
     const { scrollOnDevice, pagingSeparator, name } = this.props;
