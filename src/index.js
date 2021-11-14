@@ -175,7 +175,8 @@ class InfiniteCarousel extends Component {
   };
 
   setDimensions = () => {
-    const { settings, lowerBreakpoint, higherBreakpoint, children, currentIndex } = this.state;
+    const { settings, lowerBreakpoint, higherBreakpoint, children, currentIndex, autoCycleTimer } =
+      this.state;
     const { children: propChildren, scrollOnDevice: propScrollOnDevice } = this.props;
     const scrollOnDevice = propScrollOnDevice && isTouchDevice();
     const currentScreenWidth = getScreenWidth();
@@ -203,6 +204,7 @@ class InfiniteCarousel extends Component {
       visibleSlideList = this.getVisibleIndexes(propChildren, currentIndex);
     }
 
+    clearInterval(autoCycleTimer);
     this.setState(
       {
         activePage,
@@ -214,6 +216,8 @@ class InfiniteCarousel extends Component {
         lazyLoadedList,
         visibleSlideList,
         sideSize,
+        // clear autocycle
+        autoCycleTimer: null,
       },
       () => {
         this.playAutoCycle();
