@@ -1,6 +1,6 @@
 {
   "name": "react-leaf-carousel",
-  "version": "2.0.3",
+  "version": "3.0.0",
   "description": "React simple infinite carousel with lazy loading and responsive support",
   "scripts": {
     "build": "WEBPACK_ENV=build webpack --mode production",
@@ -58,7 +58,7 @@
     "prettier": "^2.4.1",
     "semantic-release": "^18.0.0",
     "style-loader": "^3.3.1",
-    "uglifyjs-webpack-plugin": "^2.2.0",
+    "terser-webpack-plugin": "^5.2.5",
     "webpack": "^5.64.0",
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.5.0"

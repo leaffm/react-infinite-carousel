@@ -3,8 +3,8 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const React = require('react');
 const ReactDOM = require('react-dom');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const TerserPlugin = require("terser-webpack-plugin");
 
 const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
   template: './public/index.html',
@@ -27,7 +27,8 @@ if (env === 'build') {
       libraryTarget: 'umd',
     },
     optimization: {
-      minimizer: [new UglifyJsPlugin()],
+      minimize: true,
+      minimizer: [new TerserPlugin()],
     },
     externals: [
       {
