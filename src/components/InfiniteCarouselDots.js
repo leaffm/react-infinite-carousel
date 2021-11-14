@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './InfiniteCarousel.css';
 
-function InfiniteCarouselDots({ carouselName, numberOfDots, activePage, onClick }) {
+const InfiniteCarouselDots = function ({ carouselName, numberOfDots, activePage, onClick }) {
   const dots = [];
   let classNameIcon;
   let dotName;
@@ -32,7 +32,7 @@ function InfiniteCarouselDots({ carouselName, numberOfDots, activePage, onClick 
       {dots}
     </ul>
   );
-}
+};
 
 InfiniteCarouselDots.propTypes = {
   carouselName: PropTypes.string.isRequired,

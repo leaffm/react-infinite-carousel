@@ -1,11 +1,12 @@
 module.exports = {
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   env: {
     browser: true,
     node: true,
     es6: true,
     jest: true,
   },
+  parserOptions: { ecmaVersion: 8 }, // to enable features such as async/await
   settings: {
     'import/resolver': {
       node: {
@@ -15,11 +16,10 @@ module.exports = {
   },
   extends: [
     'airbnb',
+    'eslint:recommended',
     'plugin:prettier/recommended', // Enables eslint-plugin-prettier and eslint-config-prettier. This will display prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
-    'prettier/react',
-    'prettier/standard',
   ],
-  plugins: ['prettier'],
+  // plugins: ['prettier'],
   rules: {
     'jsx-a11y/href-no-hash': 'off',
     'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
