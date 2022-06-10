@@ -56,7 +56,7 @@
     "gm-base64": "*",
     "html-webpack-plugin": "^5.5.0",
     "prettier": "^2.4.1",
-    "semantic-release": "^18.0.0",
+    "semantic-release": "^19.0.3",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.2.5",
     "webpack": "^5.64.0",
